@@ -1,0 +1,22 @@
+# 결과물은 각 IDE에서 빌드해서 쓸 테니 git 대상 제외
+/out/
+# 기타 자바/OS 공통 무시 파일(소스 파일만 공유하면 되므로)
+# *.log   # 혹시 몰라서 포함
+*.class
+*.jar
+.DS_Store
+
+# 기존 IntelliJ용 ignore 경로들
+.idea/shelf/
+.idea/workspace.xml
+.idea/httpRequests/
+.idea/mavenHomeManager.xml
+.idea/dataSources/
+.idea/dataSources.local.xml
+
+# 기본적인 빌드 환경 외의 VSCode 설정 무시
+.vscode/*
+!/.vscode/settings.json
+!/.vscode/launch.json
+!/.vscode/extensions.json
+!/.vscode/tasks.json
