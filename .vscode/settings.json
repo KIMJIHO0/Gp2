@@ -1,0 +1,5 @@
+{
+    "java.project.sourcePaths": ["src", "."],
+    "java.project.outputPath": "out",
+    "java.compile.compliance": "21"   // 자동으로 설치X.
+}
