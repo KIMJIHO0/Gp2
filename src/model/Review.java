@@ -1,31 +1,23 @@
 package model;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
-/**
- * 리뷰 엔티티.
- * - id        : 리뷰 식별자
- * - userId    : 작성자
- * - packageId : 대상 패키지
- * - score     : 1~5
- * - content   : 내용
- * - createdAt : 작성 시각
- */
+/** 리뷰 정보 */
 public class Review {
-    public final String id;
-    public final String userId;
-    public final String packageId;
-    public final int score;
+    public final int id;
+    public final int writer_id;       // 작성자 id
+    public final int tour_id;         // 대상 상품 id
+    public final int rate;            // 1~10
     public final String content;
-    public final String createdAt;
+    public final LocalDate written_date;
 
-    public Review(String id, String userId, String packageId,
-                  int score, String content, String createdAt) {
+    public Review(int id, int writer_id, int tour_id,
+                  int rate, String content, LocalDate written_date) {
         this.id = id;
-        this.userId = userId;
-        this.packageId = packageId;
-        this.score = score;
+        this.writer_id = writer_id;
+        this.tour_id = tour_id;
+        this.rate = rate;
         this.content = content;
-        this.createdAt = createdAt;
+        this.written_date = written_date;
     }
 }
