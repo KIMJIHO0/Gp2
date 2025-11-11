@@ -1,3 +1,8 @@
+package ui_kit;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 서비스(Manager) 인스턴스를 보관하는 의존성 주입(DI) 및 관리(유사 전역 싱글톤)용 컨테이너
  * Main.java에서 모든 Manager를 생성하여 이 컨텍스트에 등록합
@@ -9,14 +14,6 @@
  * fxxx
  * **굳이 볼 필요 없다 말씀드리긴 할 테지만 혹시나 이 주석을 보신다면 관대한 이해 부탁드립니다**
  */
-
-
-package ui_kit;
-
-import java.util.HashMap;
-import java.util.Map;
-
-
 public class ServiceContext {
     private final Map<Class<?>, Object> services = new HashMap<>();
 

@@ -37,41 +37,30 @@ public class AppComboBox<E> extends JComboBox<E> {
         initStyle();
     }
 
+    // 스타일 적용
     private void initStyle() {
-        setFont(UITheme.FONT_BASE);
-        setForeground(UITheme.COLOR_FOREGROUND);
-        setBackground(UITheme.COLOR_BACKGROUND); // L&F에 따라 무시될 수 있음
-        setBorder(UITheme.LINE_BORDER);
-
-        // [핵심] 콤보박스 및 드롭다운 리스트의 아이템 렌더러 설정
+        setFont(UITheme.COMBOBOX_FONT);
+        setForeground(UITheme.COMBOBOX_FG_COLOR);
+        setBackground(UITheme.COMBOBOX_BG_COLOR);
+        setBorder(UITheme.COMBOBOX_BORDER);
         setRenderer(new AppCellRenderer());
     }
 
-    /**
-     * 콤보박스의 셀 렌더러에 공통 폰트와 여백을 적용합니다.
-     */
+    // 드롭다운 항목별 스타일도 적용하여 생성
     private static class AppCellRenderer extends DefaultListCellRenderer {
-        
-        // 원본 렌더러를 조합(Composition)하거나 상속(Inheritance)할 수 있습니다.
-        // 여기서는 DefaultListCellRenderer를 상속받아 간단히 커스터마이징합니다.
-
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value,
                                                       int index, boolean isSelected,
                                                       boolean cellHasFocus) {
             
-            // 1. 기본 렌더링(선택 배경색, 텍스트 설정 등)은 부모에 위임
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-            // 2. 공통 스타일 적용
-            setFont(UITheme.FONT_BASE);
-            
-            // 3. 드롭다운 목록에 내부 여백(padding) 적용
+            setFont(UITheme.COMBOBOX_FONT);
             setBorder(BorderFactory.createEmptyBorder(
-                UITheme.PADDING.top, 
-                UITheme.PADDING.left, 
-                UITheme.PADDING.bottom, 
-                UITheme.PADDING.right
+                UITheme.COMBOBOX_ITEM_PADDING.top, 
+                UITheme.COMBOBOX_ITEM_PADDING.left, 
+                UITheme.COMBOBOX_ITEM_PADDING.bottom, 
+                UITheme.COMBOBOX_ITEM_PADDING.right
             ));
 
             return this;

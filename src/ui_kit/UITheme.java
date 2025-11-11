@@ -1,8 +1,3 @@
-/**
- * UI의 공통(기본) '스타일'과 관련된 상수 모음
- * 일단은 일괄 적용하나, 상속받은 클래스에서 덮어씌울 수 있습니당
- */
-
 package ui_kit;
 
 import java.awt.Color;
@@ -11,34 +6,77 @@ import javax.swing.border.Border;
 import javax.swing.BorderFactory;
 import java.awt.Insets;
 
-
+/**
+ * UI의 공통(기본) '스타일'과 관련된 상수 모음
+ * 즉 단순한 색, 폰트, 여백 등의 스타일링은 여기 값의 변경만으로도 가능!
+ * 일단은 일괄 적용하나, 상속받은 클래스에서 덮어씌울 수 있습니당
+ */
 public class UITheme {
 
-    // --- Fonts ---
-    // 일단 시스템 기본값
-    public static final Font FONT_BASE = new Font(Font.DIALOG, Font.PLAIN, 13);
-    public static final Font FONT_BOLD = FONT_BASE.deriveFont(Font.BOLD);
-    public static final Font FONT_TITLE = FONT_BASE.deriveFont(Font.BOLD, 16f);
-    public static final Font FONT_SMALL = FONT_BASE.deriveFont(11f);
+    // --- Base Fonts & Colors ---
+    private static final Font FONT_BASE = new Font(Font.DIALOG, Font.PLAIN, 13);
+    private static final Font FONT_BOLD = FONT_BASE.deriveFont(Font.BOLD);
+    private static final Color COLOR_PRIMARY = new Color(0, 123, 255);
+    private static final Color COLOR_PRIMARY_DARK = new Color(0, 105, 217);
+    private static final Color COLOR_TEXT_DEFAULT = new Color(33, 37, 41);
+    private static final Color COLOR_TEXT_ON_PRIMARY = Color.WHITE;
+    private static final Color COLOR_BACKGROUND_LIGHT = new Color(248, 249, 250);
+    private static final Color COLOR_BACKGROUND_WHITE = Color.WHITE;
+    private static final Color COLOR_BORDER = new Color(222, 226, 230);
 
-    // --- Colors ---
-    // 색은 대충 html color palette 참고
-    public static final Color COLOR_PRIMARY = new Color(0, 123, 255); // 파랑
-    public static final Color COLOR_PRIMARY_DARK = new Color(0, 105, 217);
-    public static final Color COLOR_FOREGROUND = new Color(33, 37, 41); // 짙은?어두운? 회색
-    public static final Color COLOR_BACKGROUND = Color.WHITE;
-    public static final Color COLOR_BORDER = new Color(222, 226, 230); // 밝은 화색
+    // --- General Panel ---
+    public static final Color PANEL_BACKGROUND_COLOR = COLOR_BACKGROUND_LIGHT;
+    public static final Border PANEL_BORDER = BorderFactory.createEmptyBorder(15, 15, 15, 15);
 
-    // --- Borders & Insets ---
-    /** 컴포넌트 내부 여백 (ex. TextField, TextArea) */
-    public static final Insets PADDING
-        = new Insets(5, 8, 5, 8);
-    
-    /** 패널용 공통 여백 */
-    public static final Border PANEL_PADDING
-        = BorderFactory.createEmptyBorder(10, 10, 10, 10);
-    
-    /** 라인이 있는 공통 테두리 */
-    public static final Border LINE_BORDER
-        = BorderFactory.createLineBorder(COLOR_BORDER);
+    // --- AppButton ---
+    public static final Font BUTTON_FONT = FONT_BOLD;
+    public static final Color BUTTON_BG_COLOR = COLOR_PRIMARY;
+    public static final Color BUTTON_BG_COLOR_HOVER = COLOR_PRIMARY_DARK;
+    public static final Color BUTTON_FG_COLOR = COLOR_TEXT_ON_PRIMARY;
+
+    // --- AppLabel ---
+    public static final Font LABEL_FONT_NORMAL = FONT_BASE;
+    public static final Font LABEL_FONT_BOLD = FONT_BOLD;
+    public static final Font LABEL_FONT_TITLE = FONT_BASE.deriveFont(Font.BOLD, 18f);
+    public static final Font LABEL_FONT_SUBTITLE = FONT_BASE.deriveFont(Font.BOLD, 14f);
+    public static final Font LABEL_FONT_SMALL = FONT_BASE.deriveFont(11f);
+    public static final Color LABEL_FG_COLOR_DEFAULT = COLOR_TEXT_DEFAULT;
+    public static final Color LABEL_FG_COLOR_MUTED = new Color(108, 117, 125);
+
+    // --- AppTextField ---
+    public static final Font TEXTFIELD_FONT = FONT_BASE;
+    public static final Color TEXTFIELD_FG_COLOR = COLOR_TEXT_DEFAULT;
+    public static final Color TEXTFIELD_BG_COLOR = COLOR_BACKGROUND_WHITE;
+    public static final Insets TEXTFIELD_PADDING = new Insets(8, 12, 8, 12);
+    public static final Border TEXTFIELD_BORDER = BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(COLOR_BORDER),
+        BorderFactory.createEmptyBorder(TEXTFIELD_PADDING.top, TEXTFIELD_PADDING.left, TEXTFIELD_PADDING.bottom, TEXTFIELD_PADDING.right)
+    );
+
+    // --- AppTextArea ---
+    public static final Font TEXTAREA_FONT = FONT_BASE;
+    public static final Color TEXTAREA_FG_COLOR = COLOR_TEXT_DEFAULT;
+    public static final Color TEXTAREA_BG_COLOR = COLOR_BACKGROUND_WHITE;
+    public static final Color TEXTAREA_BG_COLOR_DISABLED = COLOR_BACKGROUND_LIGHT;
+    public static final Insets TEXTAREA_PADDING = new Insets(8, 12, 8, 12);
+    public static final Border TEXTAREA_BORDER = BorderFactory.createLineBorder(COLOR_BORDER);
+
+    // --- AppComboBox ---
+    public static final Font COMBOBOX_FONT = FONT_BASE;
+    public static final Color COMBOBOX_FG_COLOR = COLOR_TEXT_DEFAULT;
+    public static final Color COMBOBOX_BG_COLOR = COLOR_BACKGROUND_WHITE;
+    public static final Border COMBOBOX_BORDER = BorderFactory.createLineBorder(COLOR_BORDER);
+    public static final Insets COMBOBOX_ITEM_PADDING = new Insets(5, 10, 5, 10);
+
+    // --- AppProgressBar ---
+    public static final Font PROGRESSBAR_FONT = FONT_BASE.deriveFont(11f);
+    public static final Color PROGRESSBAR_FG_COLOR = COLOR_PRIMARY;
+    public static final Color PROGRESSBAR_BG_COLOR = COLOR_BACKGROUND_LIGHT;
+    public static final Border PROGRESSBAR_BORDER = BorderFactory.createLineBorder(COLOR_BORDER);
+
+    // --- AppTitledPanel ---
+    public static final Font TITLED_PANEL_FONT = FONT_BOLD;
+    public static final Color TITLED_PANEL_FG_COLOR = COLOR_TEXT_DEFAULT;
+    public static final Border TITLED_PANEL_BORDER = BorderFactory.createLineBorder(COLOR_BORDER);
+    public static final Insets TITLED_PANEL_CONTENT_PADDING = new Insets(15, 15, 15, 15);
 }

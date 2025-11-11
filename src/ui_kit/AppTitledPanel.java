@@ -1,6 +1,3 @@
-/**
- * "제목"이 있는 공통 패널 래퍼(By. Gemini)
- */
 
 package ui_kit;
 
@@ -9,7 +6,9 @@ import javax.swing.BorderFactory;
 import javax.swing.border.TitledBorder;
 import java.awt.LayoutManager;
 
-
+/**
+ * "제목"이 있는 공통 패널 래퍼(By. Gemini)
+ */
 public class AppTitledPanel extends JPanel {
 
     private TitledBorder titledBorder;
@@ -25,20 +24,23 @@ public class AppTitledPanel extends JPanel {
     }
 
     private void initBorder(String title) {
-        // 타이틀 보더 생성
         titledBorder = BorderFactory.createTitledBorder(
-            UITheme.LINE_BORDER, // 기본 테두리
-            title,               // 제목
-            TitledBorder.LEFT,   // 정렬
+            UITheme.TITLED_PANEL_BORDER,
+            title,
+            TitledBorder.LEFT,
             TitledBorder.TOP,
-            UITheme.FONT_BOLD,   // 제목 폰트
-            UITheme.COLOR_FOREGROUND // 제목 색상
+            UITheme.TITLED_PANEL_FONT,
+            UITheme.TITLED_PANEL_FG_COLOR
         );
         
-        // 패널의 기본 여백과 타이틀 보더를 조합
         setBorder(BorderFactory.createCompoundBorder(
-            titledBorder,      // 바깥쪽: 타이틀 보더
-            UITheme.PANEL_PADDING // 안쪽: 공통 여백
+            titledBorder,
+            BorderFactory.createEmptyBorder(
+                UITheme.TITLED_PANEL_CONTENT_PADDING.top,
+                UITheme.TITLED_PANEL_CONTENT_PADDING.left,
+                UITheme.TITLED_PANEL_CONTENT_PADDING.bottom,
+                UITheme.TITLED_PANEL_CONTENT_PADDING.right
+            )
         ));
     }
     

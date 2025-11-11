@@ -7,43 +7,40 @@
 package ui_kit;
 
 import javax.swing.JButton;
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+
 
 public class AppButton extends JButton {
 
     public AppButton(String text) {
         super(text);
         
-        setFont(UITheme.FONT_BOLD);
-        setBackground(UITheme.COLOR_PRIMARY);
-        setForeground(Color.WHITE);
+        setFont(UITheme.BUTTON_FONT);
+        setBackground(UITheme.BUTTON_BG_COLOR);
+        setForeground(UITheme.BUTTON_FG_COLOR);
         
-        // 버튼 영역에 마우스가 오면 손가락 커서로 변경
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        
-        // 클릭 시 버튼 주위에 생기는 점선(포커스) 제거 (미관상)
         setFocusPainted(false);
         
-        // (선택) 마우스 오버/클릭 시 색상 변경 효과
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                setBackground(UITheme.COLOR_PRIMARY_DARK);
+                setBackground(UITheme.BUTTON_BG_COLOR_HOVER);
             }
             @Override
             public void mouseExited(MouseEvent e) {
-                setBackground(UITheme.COLOR_PRIMARY);
+                setBackground(UITheme.BUTTON_BG_COLOR);
             }
             @Override
             public void mousePressed(MouseEvent e) {
-                setBackground(UITheme.COLOR_PRIMARY.darker());
+                setBackground(UITheme.BUTTON_BG_COLOR.darker());
             }
             @Override
             public void mouseReleased(MouseEvent e) {
-                setBackground(UITheme.COLOR_PRIMARY);
+                setBackground(UITheme.BUTTON_BG_COLOR_HOVER);
             }
         });
     }

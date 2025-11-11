@@ -1,3 +1,4 @@
+
 package ui_kit;
 
 import javax.swing.JProgressBar;
@@ -19,18 +20,10 @@ public class AppProgressBar extends JProgressBar {
     }
 
     private void initStyle() {
-        setFont(UITheme.FONT_BASE);
-        
-        // 프로그레스 바의 전경색 (진행 상태 바)
-        setForeground(UITheme.COLOR_PRIMARY);
-        
-        // 프로그레스 바의 배경색 (트랙)
-        setBackground(UITheme.COLOR_BORDER);
-        
-        // [Best Practice] 퍼센트 텍스트를 기본으로 표시
+        setFont(UITheme.PROGRESSBAR_FONT);
+        setForeground(UITheme.PROGRESSBAR_FG_COLOR);
+        setBackground(UITheme.PROGRESSBAR_BG_COLOR);
         setStringPainted(true);
-        
-        // 테두리 설정
-        setBorder(UITheme.LINE_BORDER);
+        setBorder(UITheme.PROGRESSBAR_BORDER);
     }
 }

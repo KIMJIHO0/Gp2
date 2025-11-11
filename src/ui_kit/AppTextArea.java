@@ -1,15 +1,14 @@
-/**
- * 공통 AppTextArea
- * JTextArea가 아니라 JScrollPane을 상속받아, 스크롤바 자동 포함. 이게 편할듯.
- * 일단 패널에 add만 하면 거의 끝. 심플!
- */
 
 package ui_kit;
 
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 
-
+/**
+ * 공통 AppTextArea
+ * JTextArea가 아니라 JScrollPane을 상속받아, 스크롤바 자동 포함. 이게 편할듯.
+ * 일단 패널에 add만 하면 거의 끝. 심플!
+ */
 public class AppTextArea extends JScrollPane {
     // 실제 입력 핸들링용 인스턴스
     private final JTextArea textArea;
@@ -19,27 +18,16 @@ public class AppTextArea extends JScrollPane {
         
         textArea = new JTextArea(rows, columns);
         
-        // 스타일 적용
-        textArea.setFont(UITheme.FONT_BASE);
-        textArea.setForeground(UITheme.COLOR_FOREGROUND);
+        textArea.setFont(UITheme.TEXTAREA_FONT);
+        textArea.setForeground(UITheme.TEXTAREA_FG_COLOR);
+        textArea.setMargin(UITheme.TEXTAREA_PADDING);
         
-        // 자동 줄바꿈
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true); 
         
-        // 패딩
-        textArea.setMargin(UITheme.PADDING);
-
-        // JScrollPane 관련 설정
-        // JScrollPane의 Viewport에 textArea 탑재
         setViewportView(textArea);
+        setBorder(UITheme.TEXTAREA_BORDER);
         
-        // 테두리 설정
-        setBorder(UITheme.LINE_BORDER);
-        
-        // 스크롤바 정책
-        //  세로: 필요할 때만 보이도록(~AS_NEEDED)
-        //  가로: X
         setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     }
@@ -66,6 +54,7 @@ public class AppTextArea extends JScrollPane {
     
     public void setEditable(boolean editable) {
         textArea.setEditable(editable);
+        textArea.setBackground(editable ? UITheme.TEXTAREA_BG_COLOR : UITheme.TEXTAREA_BG_COLOR_DISABLED);
     }
     
     // 비상용 접근자
