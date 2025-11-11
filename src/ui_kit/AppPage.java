@@ -10,7 +10,7 @@ import java.util.function.Consumer;
  * 모든 페이지(패널)이 반드시! 상속받아야 하는 추상 클래스
  * 다른 분들은 꼭 이 클래스가 제공하는 헬퍼 메서드만 사용
  */
-public abstract class AppPanel extends JPanel {
+public abstract class AppPage extends JPanel {
     /**
      * Main에서 주입받은 ServiceContext
      * 사용자는 (this.)context.get(UserManager.class) 형태로 매니저에 접근한다
@@ -20,7 +20,7 @@ public abstract class AppPanel extends JPanel {
     /**
      * @param context 따라서 ServiceContext는 필수
      */
-    public AppPanel(ServiceContext context) {
+    public AppPage(ServiceContext context) {
         this.context = context;
         setBackground(UITheme.PANEL_BACKGROUND_COLOR);
         setBorder(UITheme.PANEL_BORDER);
@@ -58,7 +58,7 @@ public abstract class AppPanel extends JPanel {
      * [Helper]
      * 다른 페이지로 이동 요청.
      * 실패할 경우 onPageHidden은 미호출
-     * @param pageId 이동할 페이지의 ID (AppPanel의 getPageId() 값)
+     * @param pageId 이동할 페이지의 ID (AppPage의 getPageId() 값)
      */
     protected void navigateTo(String pageId) {
         AppEventBus.getInstance().publish(new PageChangeEvent(pageId));

@@ -73,7 +73,7 @@ public class AppEventBus {
     /**
      * 구독 취소.
      * once 구현하려다 그 정도로 역동적인 기능은 안 만들 것 같아서.
-     * 보통 AppPanel.onPageHidden에서 불필요한 데이터 갱신이나 렌더링(어차피 안 보임) 없앨 때 호출 권장
+     * 보통 AppPage.onPageHidden에서 불필요한 데이터 갱신이나 렌더링(어차피 안 보임) 없앨 때 호출 권장
      */
     public <T> void unsubscribe(Class<T> eventType, Consumer<T> listener) {
         List<Consumer<Object>> listenerList = listeners.get(eventType);
