@@ -1,8 +1,3 @@
-/**
- * 애플리케이션의 메인 셸(Shell)
- * 주로 CardLayout을 사용하여 AppPanel들을 교체하는 페이지 교체 및 관련 이벤트 관리 담당
- */
-
 package ui_kit;
 
 import javax.swing.JFrame;
@@ -14,7 +9,10 @@ import java.util.Map;
 
 import config.Constants;
 
-
+/**
+ * 애플리케이션의 메인 셸(Shell)
+ * 주로 CardLayout을 사용하여 AppPanel들을 교체하는 페이지 교체 및 관련 이벤트 관리 담당
+ */
 public class MainFrame extends JFrame {
     private final CardLayout cardLayout;
     private final JPanel mainPanel; // AppPanel들이 올라갈 컨테이너
@@ -30,6 +28,7 @@ public class MainFrame extends JFrame {
         // 레이아웃 설정
         cardLayout = new CardLayout();                    // 페이지 전환용 CardLayout
         mainPanel = new JPanel(cardLayout);               // CardLayout 적용하기 위한 패널
+        mainPanel.setBackground(UITheme.PANEL_BACKGROUND_COLOR);
         add(mainPanel, BorderLayout.CENTER);              // 프레임에 메인패널 추가
         
         // JMenuBar, JToolBar 등 공통 컴포넌트 초기화 가능

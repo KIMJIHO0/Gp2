@@ -1,8 +1,3 @@
-/**
- * 모든 페이지(패널)이 반드시! 상속받아야 하는 추상 클래스
- * 다른 분들은 꼭 이 클래스가 제공하는 헬퍼 메서드만 사용
- */
-
 
 package ui_kit;
 
@@ -11,7 +6,10 @@ import javax.swing.SwingWorker;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
-
+/**
+ * 모든 페이지(패널)이 반드시! 상속받아야 하는 추상 클래스
+ * 다른 분들은 꼭 이 클래스가 제공하는 헬퍼 메서드만 사용
+ */
 public abstract class AppPanel extends JPanel {
     /**
      * Main에서 주입받은 ServiceContext
@@ -24,6 +22,8 @@ public abstract class AppPanel extends JPanel {
      */
     public AppPanel(ServiceContext context) {
         this.context = context;
+        setBackground(UITheme.PANEL_BACKGROUND_COLOR);
+        setBorder(UITheme.PANEL_BORDER);
     }
 
     /**
