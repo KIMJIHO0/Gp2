@@ -38,8 +38,9 @@ public abstract class AppPage extends JPanel {
      * [선택적 오버라이드]
      * 페이지가 화면에 표시될 때 MainFrame에 의해 자동 호출
      * (ex. Manager로부터 최신 데이터 로딩 및 갱신을 runAsyncTask로 호출)
+     * @param contextData 페이지 로딩 시 추가로 받을 정보(상세페이지에 띄울 상품 id 등)
      */
-    public void onPageShown() {
+    public void onPageShown(Object contextData) {
         // if you need, override it
     }
 
@@ -62,6 +63,15 @@ public abstract class AppPage extends JPanel {
      */
     protected void navigateTo(String pageId) {
         AppEventBus.getInstance().publish(new PageChangeEvent(pageId));
+    }
+
+    /**
+     * 데이터와 함께 페이지 이동 요청
+     * @param pageId 이동할 페이지 id
+     * @param contextData 전달할 데이터(사용자 id, 항목 id 등)
+     */
+    protected void navigateTo(String pageId, Object contextData){
+        AppEventBus.getInstance().publish(new PageChangeEvent(pageId, contextData));
     }
 
     /**

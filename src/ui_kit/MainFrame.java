@@ -37,7 +37,9 @@ public class MainFrame extends JFrame {
 
         // [Important] 페이지 전환 이벤트 구독
         AppEventBus.getInstance()
-            .subscribe(PageChangeEvent.class, this::onPageChange);
+            .subscribe(PageChangeEvent.class,
+                event -> showPage(event.getPageId(), event.getContextData())
+            );
     }
 
     /**
@@ -56,19 +58,11 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 페이지 전환 이벤트 리스너
-     * AppEventBus로부터 PageChangeEvent를 받았을 때 호출함으로써 EDT 보장
-     * @param event 페이지 전환 이벤트
-     */
-    private void onPageChange(PageChangeEvent event) {
-        showPage(event.getPageId());
-    }
-
-    /**
      * 실제 CardLayout을 전환하고, Panel의 생명주기 메서드(onPageShown, onPageHidden) 호출
      * @param pageId 표시할 페이지 ID
+     * @param contextData 새 페이지로 전달할 데이터
      */
-    public void showPage(String pageId) {
+    public void showPage(String pageId, Object contextData) {
         if (!pages.containsKey(pageId)) {
             System.err.println("Page not found: " + pageId);
             return;
@@ -87,6 +81,6 @@ public class MainFrame extends JFrame {
         currentPage = pages.get(pageId);
 
         // 4. 새 페이지 로드 (데이터 로드 트리거)
-        currentPage.onPageShown();
+        currentPage.onPageShown(contextData);
     }
 }
