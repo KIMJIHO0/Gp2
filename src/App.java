@@ -16,20 +16,22 @@ import manager.UserManager;
 import manager.TourCatalog;
 import manager.ReservationManager;
 import manager.ReviewManager;
-import manager.SessionManager; // (manager 패키지 내로 가정)
-
+// import SessionManager; // (루트 디렉토리)
+import manager.SessionManager;
 // 3. UI-Kit 및 페이지 임포트
 import ui_kit.MainFrame;
 import ui_kit.ServiceContext;
 import ui_kit.AppPage;
 import pages.DefaultPage;
-import pages.TourDetailPage; // [수정] SamplePage (TourDetailPage) 임포트
+// (실제 운영 시) import pages.LoginPage;
+// (실제 운영 시) import pages.HomePage;
+// (실제 운영 시) import pages.TourPanel;
 
 /**
  * 애플리케이션의 메인 엔트리 클래스입니다.
  * 모든 의존성을 조립(Wiring)하고 앱을 실행합니다.
  */
-public class TestApp {
+public class App {
 
     public static void main(String[] args) {
         // Swing 앱은 항상 Event Dispatch Thread(EDT)에서 실행해야 합니다.
@@ -42,13 +44,12 @@ public class TestApp {
             ReviewDAO reviewDAO = new MemReviewDAO();
 
             // --- 2. Manager 계층 생성 (DAO 주입) ---
-            // (제공해주신 생성자 시그니처 유지)
             UserManager userManager = new UserManager(userDAO);
             TourCatalog tourCatalog = new TourCatalog(tourDAO);
             ReservationManager reservationManager = new ReservationManager(reservationDAO,
-                                                           userDAO, tourDAO);
+                                                    userDAO, tourDAO);
             ReviewManager reviewManager = new ReviewManager(reviewDAO,
-                                                 reservationDAO, userDAO, tourDAO);
+                                            reservationDAO, userDAO, tourDAO);
             
             // --- 3. 전역 세션 매니저 생성 ---
             SessionManager sessionManager = new SessionManager();
@@ -65,10 +66,10 @@ public class TestApp {
             MainFrame mainFrame = new MainFrame();
 
             // --- 6. 페이지 생성 및 MainFrame에 등록 ---
-            mainFrame.addPage(new DefaultPage(context)); 
+            // (팀원들이 pages/ 패키지에 만든 패널들을 여기서 조립합니다)
             
-            // [수정] SamplePage (TourDetailPage) 등록
-            mainFrame.addPage(new TourDetailPage(context));
+            // 조건 3: 생성한 기본 페이지 등록
+            mainFrame.addPage(new DefaultPage(context)); 
             
             // (실제 운영 시 예시)
             // mainFrame.addPage(new LoginPage(context));
@@ -77,13 +78,13 @@ public class TestApp {
             // mainFrame.addPage(new TourPanel(context));
 
             // --- 7. 애플리케이션 실행 ---
-            mainFrame.setTitle("코딩 시 참고/예시용 샘플 페이지(pages/TourDetailPage, 페이지 이동 등은 구현되지 않았습니다.)");
+            mainFrame.setTitle("Tour Management System (TMS)");
             mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             mainFrame.setSize(1280, 800);
             mainFrame.setLocationRelativeTo(null); // 화면 중앙에 배치
 
-            // [수정] "default" 대신 "tourDetail" 페이지를 샘플 ID(123L)와 함께 시작
-            mainFrame.showPage("tourDetail", 123L); 
+            // 조건 3: 만든 기본 페이지를 시작 페이지로 띄움
+            mainFrame.showPage("default", null); 
             mainFrame.setVisible(true);
         });
     }
