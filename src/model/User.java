@@ -1,7 +1,12 @@
 package model;
 
+import dao.UserDAO;
+
+import java.util.List;
+import java.util.Optional;
+
 /** 사용자 기본 계정 정보 */
-public class User {
+public class User{
     public final int id;
     public final String password; // 해시 또는 평문(실습에 맞게 선택)
 
@@ -10,8 +15,8 @@ public class User {
         this.password = password;
     }
 
-  @Override
-  public String toString() {
-    return "User{" + "id=" + id + ", password=" + password + '}';
-  }
+     @Override
+     public String toString() {
+       return "User{" + "id=" + id + ", password=" + password + '}';
+     }
 }
