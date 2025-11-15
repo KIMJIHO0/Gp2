@@ -27,4 +27,10 @@ public class Reservation {
         return new Reservation(id, client_id, tour_id,
                 start_date, newStatus, reservedDate);
     }
+
+  @Override
+  public String toString() {
+    return "Reservation{" + "id=" + id + ", client_id=" + client_id + ", tour_id=" + tour_id +
+        ", start_date=" + start_date+ ", status=" + status + ", reservedDate=" + reservedDate + '}';
+  }
 }

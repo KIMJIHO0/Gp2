@@ -30,4 +30,10 @@ public class MemReviewDAO implements ReviewDAO {
                 .filter(r -> r.tour_id == tourId)
                 .collect(Collectors.toList());
     }
+
+     public void seed(List<Review> reviews) {
+        for(Review r : reviews) {
+          store.put(r.id, r);
+       }
+     }
 }

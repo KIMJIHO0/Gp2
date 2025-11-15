@@ -35,4 +35,10 @@ public class MemReservationDAO implements ReservationDAO {
                 .filter(r -> r.client_id == clientId)
                 .collect(Collectors.toList());
     }
+
+    public void seed(List<Reservation> reservations) {
+       for(Reservation r : reservations) {
+          store.put(r.id, r);
+       }
+     }
 }

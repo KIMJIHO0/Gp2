@@ -22,4 +22,10 @@ public class MemTourDAO implements TourDAO {
     public Optional<TourPackage> getTour(int id) {
         return Optional.ofNullable(store.get(id));
     }
+
+      public void seed(List<TourPackage> tour) {
+       for(TourPackage t : tour) {
+          store.put(t.id, t);
+       }
+      }
 }

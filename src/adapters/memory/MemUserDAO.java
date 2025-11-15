@@ -37,4 +37,10 @@ public class MemUserDAO implements UserDAO {
     public boolean deleteUser(int id) {
         return store.remove(id) != null;
     }
+
+     public void seed(List<User> users) {
+       for(User user : users) {
+         store.put(user.id, user);
+       }
+     }
 }

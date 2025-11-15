@@ -20,4 +20,10 @@ public class Review {
         this.content = content;
         this.written_date = written_date;
     }
+
+  @Override
+  public String toString() {
+    return "Review{" + "id=" + id + ", writer_id=" + writer_id + ", tour_id=" + tour_id
+        + ", rate=" + rate + ", content=" + content + ", written_date=" + written_date+ '}';
+  }
 }
