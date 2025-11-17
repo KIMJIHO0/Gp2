@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
-import java.awt.Color;
 
 
 
@@ -57,7 +56,7 @@ public class Sidebar extends AppPanel {
         // 2. 메뉴바(컨테이너)
         menuPanel = new AppPanel();
         menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS)); // 세로 쌓기
-        menuPanel.setBackground(new Color(0,0,0,0));
+        menuPanel.setBackground(UITheme.TRANSPARENT);
         add(menuPanel, BorderLayout.CENTER);
 
         // 3. 로그아웃 버튼

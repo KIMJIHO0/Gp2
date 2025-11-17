@@ -57,7 +57,7 @@ public class TourBanner extends AppPanel {
         // 8. CENTER: 텍스트 (제목, 부가정보)
         AppPanel centerTextPanel = new AppPanel();
         centerTextPanel.setLayout(new BoxLayout(centerTextPanel, BoxLayout.Y_AXIS));
-        centerTextPanel.setOpaque(false); // 부모 패널(TourBanner)의 투명 배경 사용
+        centerTextPanel.setBackground(UITheme.TRANSPARENT);
 
         titleLabel = new AppLabel(" "); // 생성자에서 채워짐
         titleLabel.setFont(UITheme.TOUR_BANNER_TITLE_FONT);
@@ -74,10 +74,10 @@ public class TourBanner extends AppPanel {
         // 6. EAST: 버튼 ("상세보기")
         // (수직 중앙 정렬을 위해 SearchBar에서 사용한 GridBagLayout 래퍼 사용)
         AppPanel buttonWrapper = new AppPanel(new GridBagLayout());
-        buttonWrapper.setOpaque(false); // 투명 배경
+        buttonWrapper.setBackground(UITheme.TRANSPARENT);
 
-        detailButton = new AppButton("상세보기"); // AppButton(text, autoStyling=true)
-        // (UITheme.AppButton 기본 스타일이 적용됨)
+        detailButton = new AppButton("상세보기", false); // AppButton(text, autoStyling=true)
+        detailButton.setBackground(UITheme.TOUR_BANNER_DETAILBTN_COLOR);
 
         buttonWrapper.add(detailButton, new GridBagConstraints()); // 중앙에 배치
         add(buttonWrapper, BorderLayout.EAST);

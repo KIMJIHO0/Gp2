@@ -48,7 +48,7 @@ public class SearchBar extends AppPanel {
         // 2. WEST 영역: GridBagLayout으로 변경
         // AppPanel westPanel = new AppPanel(new FlowLayout(FlowLayout.LEFT, 5, 0)); // (X)
         AppPanel westPanel = new AppPanel(new GridBagLayout()); // (O)
-        westPanel.setBackground(new Color(0,0,0,0));
+        westPanel.setBackground(UITheme.TRANSPARENT);
 
         // GridBagLayout의 설정을 위한 GridBagConstraints
         GridBagConstraints gbc = new GridBagConstraints();

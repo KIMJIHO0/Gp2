@@ -30,6 +30,7 @@ public class UITheme {
     private static final Color COLOR_BACKGROUND_LIGHTBLUE = new Color(219, 168, 234, (int)(255 * 0.45)); // 하늘색 배경
     private static final Color COLOR_BORDER = new Color(222, 226, 230);
     private static final Color COLOR_GRID = new Color(233, 236, 239); // (Table용)
+    public static final Color TRANSPARENT = new Color(0,0,0,0);
 
     // --- General Panel ---
     public static final Color PANEL_BACKGROUND_COLOR = COLOR_BACKGROUND_LIGHT; // AppTitledPanel, AppBasePanel 등 패널의 기본 배경색
@@ -162,16 +163,11 @@ public class UITheme {
     public static final String RESET_ICON_PATH = "res/icons/arrow_reset.png";
 
     // --- component - TourBanner (이미지 1개 항목) ---
-    // 썸네일 이미지 크기
-    public static final Dimension TOUR_BANNER_THUMBNAIL_SIZE = new Dimension(93, 93);
-    // 제목(h4) 폰트 (예: 16pt 굵게)
-    public static final Font TOUR_BANNER_TITLE_FONT = FONT_BOLD.deriveFont(16f);
-    // 부가정보(지역, 기간 등) 폰트 (예: 13pt 보통)
-    public static final Font TOUR_BANNER_SUB_FONT = FONT_BASE.deriveFont(13f);
-    // 부가정보 텍스트 색상
-    public static final Color TOUR_BANNER_SUB_FG_COLOR = Color.BLACK;
-    // 전체 배너 패널의 내부 여백 (상하좌우 16)
-    public static final Border TOUR_BANNER_PADDING = BorderFactory.createEmptyBorder(16, 16, 16, 16);
-    // 전체 배너 배경색 (투명)
-    public static final Color TOUR_BANNER_BG_COLOR = new Color(0, 0, 0, 0); 
+    public static final Dimension TOUR_BANNER_THUMBNAIL_SIZE = new Dimension(93, 93); // 썸네일 이미지 크기
+    public static final Font TOUR_BANNER_TITLE_FONT = FONT_BOLD.deriveFont(16f); // 제목(h4) 폰트 (예: 16pt 굵게)
+    public static final Font TOUR_BANNER_SUB_FONT = FONT_BASE.deriveFont(13f); // 부가정보(지역, 기간 등) 폰트 (예: 13pt 보통)
+    public static final Color TOUR_BANNER_SUB_FG_COLOR = Color.BLACK; // 부가정보 텍스트 색상
+    public static final Border TOUR_BANNER_PADDING = BorderFactory.createEmptyBorder(16, 16, 16, 16); // 전체 배너 패널의 내부 여백 (상하좌우 16)
+    public static final Color TOUR_BANNER_BG_COLOR = new Color(0, 0, 0, 0); // 전체 배너 배경색 (투명)
+    public static final Color TOUR_BANNER_DETAILBTN_COLOR = new Color(249,249,249);
 }
