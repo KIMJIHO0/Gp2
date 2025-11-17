@@ -5,7 +5,7 @@ import ui_kit.AppLabel.LabelType;
 import manager.TourCatalog;
 import manager.ReservationManager;
 import manager.SessionManager;
-// import model.TourPackage; // (실제 모델 클래스)
+import model.TourPackage; // (실제 모델 클래스)
 // import events.UserLoggedOutEvent; // (실제 이벤트 클래스)
 // import events.ReviewAddedEvent; // (실제 이벤트 클래스)
 
@@ -196,7 +196,8 @@ public class TourDetailPage extends AppPage {
                 // descriptionArea.setText(currentTour.getDetails());
                 
                 titleLabel.setText("투어 상세 (ID: " + tourId + ")");
-                descriptionArea.setText(result.toString() + "\n\n이 투어의 상세 설명이 여기에 표시됩니다.");
+                TourPackage tour = context.get(TourCatalog.class).getTour(tourId.intValue());
+                descriptionArea.setText(result.toString() + tour.name);
                 
                 loadingBar.setIndeterminate(false);
                 loadingBar.setValue(100);
