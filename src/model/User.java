@@ -1,10 +1,5 @@
 package model;
 
-import dao.UserDAO;
-
-import java.util.List;
-import java.util.Optional;
-
 /** 사용자 기본 계정 정보 */
 public class User{
     public final int id;

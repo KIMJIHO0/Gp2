@@ -2,9 +2,7 @@ package repository;
 
 import model.Reservation;
 
-import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Scanner;
 
 public class ReservationItem implements Manageable{

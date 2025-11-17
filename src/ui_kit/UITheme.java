@@ -110,6 +110,16 @@ public class UITheme {
     public static final int TABLE_ROW_HEIGHT = 30; // 테이블 각 행의 높이 (픽셀)
     public static final Insets TABLE_CELL_PADDING = new Insets(5, 8, 5, 8); // 테이블 각 셀의 내부 여백
 
+    // --- AppScrollPane ---
+    // 스크롤바 썸(Thumb, 핸들) 색상
+    public static final Color SCROLLBAR_THUMB_COLOR = new Color(108, 117, 125);
+    // 스크롤바 트랙(Trough, 배경) 색상
+    public static final Color SCROLLBAR_TRACK_COLOR = new Color(240, 240, 240);
+    // 스크롤패널 자체의 테두리 (없음)
+    public static final Border SCROLLBAR_BORDER = BorderFactory.createEmptyBorder();
+    // 스크롤패널 뷰포트 배경색 (투명)
+    public static final Color SCROLLBAR_VIEWPORT_BG = new Color(0,0,0,0);
+
 
     // CatalogPage
     public static final Border CATALOG_PANEL_BORDER = BorderFactory.createEmptyBorder(57,30,0,30);
@@ -150,4 +160,18 @@ public class UITheme {
     // 아이콘 경로
     public static final String SEARCH_ICON_PATH = "res/icons/search.png";
     public static final String RESET_ICON_PATH = "res/icons/arrow_reset.png";
+
+    // --- component - TourBanner (이미지 1개 항목) ---
+    // 썸네일 이미지 크기
+    public static final Dimension TOUR_BANNER_THUMBNAIL_SIZE = new Dimension(93, 93);
+    // 제목(h4) 폰트 (예: 16pt 굵게)
+    public static final Font TOUR_BANNER_TITLE_FONT = FONT_BOLD.deriveFont(16f);
+    // 부가정보(지역, 기간 등) 폰트 (예: 13pt 보통)
+    public static final Font TOUR_BANNER_SUB_FONT = FONT_BASE.deriveFont(13f);
+    // 부가정보 텍스트 색상
+    public static final Color TOUR_BANNER_SUB_FG_COLOR = Color.BLACK;
+    // 전체 배너 패널의 내부 여백 (상하좌우 16)
+    public static final Border TOUR_BANNER_PADDING = BorderFactory.createEmptyBorder(16, 16, 16, 16);
+    // 전체 배너 배경색 (투명)
+    public static final Color TOUR_BANNER_BG_COLOR = new Color(0, 0, 0, 0); 
 }
