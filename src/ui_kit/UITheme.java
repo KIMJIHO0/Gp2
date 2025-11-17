@@ -5,6 +5,7 @@ import java.awt.Font;
 import javax.swing.border.Border;
 import javax.swing.BorderFactory;
 import java.awt.Insets;
+import java.awt.Dimension;
 
 /**
  * UI의 공통(기본) '스타일'과 관련된 상수 모음
@@ -109,6 +110,10 @@ public class UITheme {
     public static final int TABLE_ROW_HEIGHT = 30; // 테이블 각 행의 높이 (픽셀)
     public static final Insets TABLE_CELL_PADDING = new Insets(5, 8, 5, 8); // 테이블 각 셀의 내부 여백
 
+
+    // CatalogPage
+    public static final Border CATALOG_PANEL_BORDER = BorderFactory.createEmptyBorder(57,30,0,30);
+
     // component - AppNameLabel
     public static final int APPNAME_SIZE = 40; // 기본 글씨 크기(px) 
     public static final Color APPNAME_FG_COLOR = new Color(55, 136, 167); // 글자색
@@ -124,7 +129,7 @@ public class UITheme {
         365.0 / 695 , // 메뉴들
         150.0 / 695   // 로그아웃 버튼
     };
-    public static final Color SIDEBAR_MENU_SELECTED_COLOR = Color.WHITE;
+    public static final Color SIDEBAR_MENU_SELECTED_COLOR = COLOR_BACKGROUND_LIGHT;
     public static final Color SIDEBAR_MENU_DEFAULT_COLOR = null; // transparent
     public static final Font SIDEBAR_MENU_FONT = new Font("SansSerif", Font.PLAIN, 20);
     public static final Color SIDEBAR_MENU_FONT_COLOR = Color.BLACK;
@@ -133,4 +138,16 @@ public class UITheme {
     // component - buttons
     public static final Color ACCOUNT_BUTTON_FG_COLOR = APPNAME_FG_COLOR;
     public static final Color ACCOUNT_BUTTON_BG_COLOR = COLOR_BACKGROUND_LIGHTBLUE;
+
+    // --- component - SearchBar ---
+    public static final Color SEARCH_BAR_BG_COLOR = new Color(185, 212, 224); // 이미지의 하늘색 배경
+    public static final int SEARCH_BAR_HEIGHT = 55; // 검색바 패널의 고정 높이
+    public static final Border SEARCH_BAR_PADDING = BorderFactory.createEmptyBorder(9, 16, 10, 16);
+    public static final Dimension SEARCH_BAR_COMBO_SIZE = new Dimension(80, 27); // 콤보박스 크기
+    public static final Color SEARCH_BAR_TEXT_FIELD_BG = Color.WHITE; // 검색창 배경색
+    public static final int SEARCH_BAR_ICON_SIZE = 18;
+    
+    // 아이콘 경로
+    public static final String SEARCH_ICON_PATH = "res/icons/search.png";
+    public static final String RESET_ICON_PATH = "res/icons/arrow_reset.png";
 }

@@ -98,7 +98,7 @@ public class Sidebar extends AppPanel {
     private void setSelected(AppButton item){
         for(AppButton button : menuItems){
             if(button == item){
-                button.setOpaque(true); // 불투명도 활성화
+                button.setOpaque(true); // 불투명도 활성화(뒤에 있는 것 무시)
                 button.setBackground(UITheme.SIDEBAR_MENU_SELECTED_COLOR);
             } else {
                 styleTransparentButton(button);
