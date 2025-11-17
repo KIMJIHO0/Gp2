@@ -3,7 +3,9 @@ package ui_kit;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.BorderLayout;
+import javax.swing.JComponent;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +24,7 @@ public class MainFrame extends JFrame {
     public MainFrame() {
         setTitle(Constants.UI_TITLE);                     // 화면 이름
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   // 닫기 시 작업
-        setSize(Constants.UI_WIDTH, Constants.UI_HEIGHT); // 화면 크기
+        // setSize(Constants.UI_WIDTH, Constants.UI_HEIGHT); // 화면 크기
         setLocationRelativeTo(null);                    // 화면 초기 위치(null=가운데)
 
         // 레이아웃 설정
@@ -30,6 +32,13 @@ public class MainFrame extends JFrame {
         mainPanel = new JPanel(cardLayout);               // CardLayout 적용하기 위한 패널
         mainPanel.setBackground(UITheme.PANEL_BACKGROUND_COLOR);
         add(mainPanel, BorderLayout.CENTER);              // 프레임에 메인패널 추가
+        // 화면 크기를 content 영역에 맞추기
+        mainPanel.setPreferredSize(new Dimension(UITheme.WINDOW_WIDTH, UITheme.WINDOW_HEIGHT));
+        pack(); // setSize대신 호출하여 맞춤 설정
+        // 기본 Border 제거
+        var contentPane = getContentPane();
+        if(contentPane instanceof JComponent)
+            ((JComponent) contentPane).setBorder(null);
         
         // JMenuBar, JToolBar 등 공통 컴포넌트 초기화 가능
         // JMenuBar menuBar = createGlobalMenuBar();
