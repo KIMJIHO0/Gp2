@@ -4,12 +4,18 @@
  * 클릭 가능한 TourBanner 컴포넌트 목록을 구현합니다.
  */
 
+// Todo
+// 스크롤 패널 CardLayout으로 씌우고 좌측 메뉴 클릭에 따라 전환되도록
+
 package pages;
 
 import ui_kit.*;
 import pages.component.Sidebar;
 import pages.component.SearchBar;
 import pages.component.TourBanner;
+import manager.ReviewManager;
+import manager.TourCatalog;
+import model.TourPackage;
 
 import java.awt.BorderLayout;
 import javax.swing.BoxLayout;
@@ -17,17 +23,15 @@ import javax.swing.ScrollPaneConstants;
 
 
 public class CatalogPage extends AppPage {
-    
-    // (ServiceContext가 정의되어 있다고 가정)
+    public static final String ID = "catalog";
+
     public CatalogPage(ServiceContext ctx){ 
         super(new BorderLayout(), ctx);
         init();
     }
 
     @Override
-    public String getPageId(){
-        return "catalog";
-    }
+    public String getPageId(){ return CatalogPage.ID; }
 
     private Sidebar sideNav;
     private SearchBar searchBar;
@@ -81,6 +85,8 @@ public class CatalogPage extends AppPage {
         add(mainContentPanel, BorderLayout.CENTER);
 
         applySearchCallbacks();
+
+        renderBanners(packageListPanel);
     }
 
     /**
@@ -89,19 +95,39 @@ public class CatalogPage extends AppPage {
      */
     private void applySearchCallbacks(){
         searchBar.addSearchListener(e -> {
-            System.out.println("검색 실행:");
-            System.out.println(" - 지역: " + searchBar.getSelectedRegion());
-            System.out.println(" - 가격: " + searchBar.getSelectedPriceRange());
-            System.out.println(" - 텍스트: " + searchBar.getSearchText());
-            // TODO: packageListPanel의 내용을 실제 검색 결과로 업데이트
-            // 예: packageListPanel.removeAll(); addSampleBanners(packageListPanel); ...
+            // Todo: 현재 렌더링된 패키지 목록 필터 적용
         });
 
         searchBar.addResetListener(e -> {
             searchBar.clearFilters();
-            System.out.println("필터 초기화됨");
-            // TODO: packageListPanel의 내용을 전체 목록으로 복원
+            // 필터 초기화 반영
         });
+    }
+
+    /**
+     * 데이터 적용 테스트
+     * @param panel 적용할 패널
+     */
+    private void renderBanners(AppPanel panel){
+        TourCatalog catalog = context.get(TourCatalog.class);
+        for(final int id : catalog.getTourIds()){
+            TourPackage tour = catalog.getTour(id);
+            TourBanner banner = new TourBanner(
+                tour.name,
+                tour.place,
+                (tour.day_long-1)+"박 "+tour.day_long+"일",
+                (tour.price/10000)+"만원",
+                "★★★★★"
+            );
+
+            banner.addDetailButtonListener(e -> {
+                System.out.println("상세보기 클릭: " + tour.name);
+                // TODO: 상세 페이지로 이동 (ServiceContext.getInstance().navigate(...))
+            });
+
+            System.out.println(tour.name);
+            panel.add(banner);
+        }
     }
     
     /**
