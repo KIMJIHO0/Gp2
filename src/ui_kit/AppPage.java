@@ -1,10 +1,12 @@
 
 package ui_kit;
 
+import java.awt.LayoutManager;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
+import java.awt.Dimension;
 
 /**
  * 모든 페이지(패널)이 반드시! 상속받아야 하는 추상 클래스
@@ -15,15 +17,24 @@ public abstract class AppPage extends JPanel {
      * Main에서 주입받은 ServiceContext
      * 사용자는 (this.)context.get(UserManager.class) 형태로 매니저에 접근한다
      */
-    protected final ServiceContext context;
+    protected ServiceContext context;
 
     /**
      * @param context 따라서 ServiceContext는 필수
      */
     public AppPage(ServiceContext context) {
-        this.context = context;
+        init(context);
+    }
+    public AppPage(LayoutManager layout, ServiceContext context) {
+        super(layout);
+        init(context);
+    }
+    private void init(ServiceContext ctx){
+        context = ctx;
         setBackground(UITheme.PANEL_BACKGROUND_COLOR);
         setBorder(UITheme.PANEL_BORDER);
+        // 기본적으로 화면을 가득 채우도록
+        setPreferredSize(new Dimension(UITheme.WINDOW_WIDTH, UITheme.WINDOW_HEIGHT));
     }
 
     /**

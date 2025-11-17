@@ -12,6 +12,10 @@ import java.awt.Insets;
  * 일단은 일괄 적용하나, 상속받은 클래스에서 덮어씌울 수 있습니당
  */
 public class UITheme {
+    // 기본 창 설정
+    public static final String WINDOW_TITLE = "OO항공"; // 창 이름
+    public static final int WINDOW_WIDTH = 1002,  // 창 가로 크기
+                            WINDOW_HEIGHT = 695;  // 창 세로 크기
 
     // --- Base Fonts & Colors ---
     private static final Font FONT_BASE = new Font(Font.DIALOG, Font.PLAIN, 13);
@@ -22,12 +26,13 @@ public class UITheme {
     private static final Color COLOR_TEXT_ON_PRIMARY = Color.WHITE;
     private static final Color COLOR_BACKGROUND_LIGHT = new Color(248, 249, 250);
     private static final Color COLOR_BACKGROUND_WHITE = Color.WHITE;
+    private static final Color COLOR_BACKGROUND_LIGHTBLUE = new Color(219, 168, 234, (int)(255 * 0.45)); // 하늘색 배경
     private static final Color COLOR_BORDER = new Color(222, 226, 230);
     private static final Color COLOR_GRID = new Color(233, 236, 239); // (Table용)
 
     // --- General Panel ---
     public static final Color PANEL_BACKGROUND_COLOR = COLOR_BACKGROUND_LIGHT; // AppTitledPanel, AppBasePanel 등 패널의 기본 배경색
-    public static final Border PANEL_BORDER = BorderFactory.createEmptyBorder(15, 15, 15, 15); // 패널류의 기본 내부 여백
+    public static final Border PANEL_BORDER = BorderFactory.createEmptyBorder(0,0,0,0); // 패널류의 기본 내부 여백
 
     // --- AppButton ---
     public static final Font BUTTON_FONT = FONT_BOLD; // 버튼 텍스트 폰트
@@ -103,4 +108,29 @@ public class UITheme {
     public static final Border TABLE_BORDER = BorderFactory.createLineBorder(COLOR_BORDER); // 테이블 스크롤패널의 테두리
     public static final int TABLE_ROW_HEIGHT = 30; // 테이블 각 행의 높이 (픽셀)
     public static final Insets TABLE_CELL_PADDING = new Insets(5, 8, 5, 8); // 테이블 각 셀의 내부 여백
+
+    // component - AppNameLabel
+    public static final int APPNAME_SIZE = 40; // 기본 글씨 크기(px) 
+    public static final Color APPNAME_FG_COLOR = new Color(55, 136, 167); // 글자색
+    public static final String APPNAME_TEXT = "OO항공"; // 내용
+    public static final Color APPNAME_BG_COLOR = null; // transparent
+    public static final String APPNAME_FONT = "SansSerif"; // 폰트. 보통 OS 내장. Times New Roman으로 하려다 한글 깨짐...
+
+    // component - Sidebar
+    public static final int SIDEBAR_WIDTH = 214;     // 사이드바 가로크기
+    public static final Color SIDEBAR_BG_COLOR = COLOR_BACKGROUND_LIGHTBLUE; // 배경색 rgba
+    public static final double[] SIDEBAR_GRID_COL_TEMPLATES = new double[]{ // 사이드바 세로 분할 비율
+        180 , // 앱 이름 세로비율
+        365.0 / 695 , // 메뉴들
+        150.0 / 695   // 로그아웃 버튼
+    };
+    public static final Color SIDEBAR_MENU_SELECTED_COLOR = Color.WHITE;
+    public static final Color SIDEBAR_MENU_DEFAULT_COLOR = null; // transparent
+    public static final Font SIDEBAR_MENU_FONT = new Font("SansSerif", Font.PLAIN, 20);
+    public static final Color SIDEBAR_MENU_FONT_COLOR = Color.BLACK;
+    public static final int[] SIDEBAR_MENU_ITEM_PADDING = new int[]{8,0,8,0}; // top left bottom right
+
+    // component - buttons
+    public static final Color ACCOUNT_BUTTON_FG_COLOR = APPNAME_FG_COLOR;
+    public static final Color ACCOUNT_BUTTON_BG_COLOR = COLOR_BACKGROUND_LIGHTBLUE;
 }
