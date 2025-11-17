@@ -74,11 +74,8 @@ public class Sidebar extends AppPanel {
      * @param method 버튼 눌렸을 때 기능(콜백)
      */
     public void addMenu(String name, ActionListener method){
-        AppButton item = new AppButton(name);
+        AppButton item = new AppButton(name, false);
         styleMenuButton(item, true);
-
-        // 기본 마우스 리스너 제거(스타일에 방해됨)
-        item.removeMouseListener(item.getMouseListeners()[item.getMouseListeners().length-1]);
 
         item.addActionListener(e -> {
             setSelected(item);
