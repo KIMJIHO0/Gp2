@@ -15,7 +15,6 @@ import ui_kit.AppButton;
 import java.util.List;
 
 import javax.swing.BoxLayout;
-import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.BorderFactory;
 
 import java.util.ArrayList;
@@ -78,6 +77,9 @@ public class Sidebar extends AppPanel {
         AppButton item = new AppButton(name);
         styleMenuButton(item, true);
 
+        // 기본 마우스 리스너 제거(스타일에 방해됨)
+        item.removeMouseListener(item.getMouseListeners()[item.getMouseListeners().length-1]);
+
         item.addActionListener(e -> {
             setSelected(item);
             // 사이드바 밖에서 일어나는 처리(페이지 단위 이동이나 우측 card 교체 등) 위임
@@ -100,7 +102,6 @@ public class Sidebar extends AppPanel {
         for(AppButton button : menuItems){
             if(button == item){
                 button.setOpaque(true); // 불투명도 활성화
-                // button.setContentAreaFilled(true);
                 button.setBackground(UITheme.SIDEBAR_MENU_SELECTED_COLOR);
             } else {
                 styleTransparentButton(button);
@@ -127,7 +128,6 @@ public class Sidebar extends AppPanel {
 
         // swing 기본 스타일 덮어쓰기 문제 방지
         styleTransparentButton(button);
-        button.setUI(new BasicButtonUI());
     }
 
     /**
