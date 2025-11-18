@@ -11,7 +11,7 @@ public class RateToStar {
         StringBuilder builder = new StringBuilder();
         int offset = ReviewManager.RATE_RANGE[0];
         int range = ReviewManager.RATE_RANGE[1] - offset + 1;
-        int count = ((Long)Math.round((rate - offset + 1) / (double)range * star_count)).intValue(); // ex) round(5/10*5) = 3
+        int count = (int)Math.round((rate - offset + 1) / (double)range * star_count);// ex) round(5/10*5) = 3
         for(int i = 0; i < star_count; i++)
             builder.append(i < count? filled: empty);
         return builder.toString();

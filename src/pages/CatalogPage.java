@@ -10,6 +10,7 @@
 package pages;
 
 import ui_kit.*;
+import util.RateToStar;
 import pages.component.Sidebar;
 import pages.component.SearchBar;
 import pages.component.TourBanner;
@@ -117,7 +118,7 @@ public class CatalogPage extends AppPage {
                 tour.place,
                 (tour.day_long-1)+"박 "+tour.day_long+"일",
                 (tour.price/10000)+"만원",
-                "★★★★★"
+                RateToStar.stringify((int)Math.round(context.get(ReviewManager.class).getAverageRateOfTour(id)))
             );
 
             banner.addDetailButtonListener(e -> {
