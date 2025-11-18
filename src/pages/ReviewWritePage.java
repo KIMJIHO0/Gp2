@@ -95,10 +95,10 @@ public class ReviewWritePage extends AppPage {
         //취소 버튼
         cancelButton.addActionListener(e->{
             if(targetPackageId != null){
-                navigateTo("tourDetail", targetPackageId);
+                navigateTo("catalog", 2);
             } //여기를 나중에 예약 확인 페이지 id로 수정
             else{
-                navigateTo("tourList");
+                navigateTo("catalog", 1);
             }
         });
     }
@@ -122,7 +122,6 @@ public class ReviewWritePage extends AppPage {
     public void onPageShown(Object contextData) {
         if (contextData instanceof Long) {
             this.targetPackageId = (Long) contextData;
-            // TODO: 필요시 TourCatalog로 이름 로드
         } else {
             this.targetPackageId = null;
             packageLabel.setText("오류: 잘못된 접근입니다. 예약 확인 페이지에서 다시 시도해주세요.");
@@ -207,7 +206,7 @@ public class ReviewWritePage extends AppPage {
                     publishEvent(new ReviewAddedEvent(tourId, writerId));
 
                     // 성공 시: 패키지 상세로 복귀
-                    navigateTo("tourDetail", targetPackageId);
+                    navigateTo("catalog", targetPackageId);
                 } else {
                     // 실패 코드에 따른 에러 메시지
                     showErrorForResponseCode(code);

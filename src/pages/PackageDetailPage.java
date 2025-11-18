@@ -14,7 +14,7 @@ import ui_kit.*;
 import ui_kit.AppLabel.LabelType;
 
 
-public class TourDetailPage1 extends AppPage {
+public class PackageDetailPage extends AppPage {
 
     // 1. 매니저 (생성자에서 주입)
     private TourCatalog tourCatalog;
@@ -39,7 +39,7 @@ public class TourDetailPage1 extends AppPage {
     /**
      * AppPage의 계약: ServiceContext를 받아 부모에게 넘기고, 필요한 매니저를 가져옵니다.
      */
-    public TourDetailPage1(ServiceContext context) {
+    public PackageDetailPage(ServiceContext context) {
         super(context);
 
         this.tourCatalog = context.get(TourCatalog.class);
@@ -286,10 +286,10 @@ public class TourDetailPage1 extends AppPage {
 
                     switch (choice) {
                         case 0 :
-                            navigateTo("reservationList");
+                            navigateTo("catalog", 2);
                             break;
-                        case 1: navigateTo("catalog"); break;
-                        case 2: navigateTo("recommands"); break;
+                        case 1: navigateTo("catalog", 1); break;
+                        case 2: navigateTo("catalog",3); break;
                         default: break;
                     }
                     // NO_OPTION이면 아무 것도 안 하고 현재 상세 페이지에 남아 있음

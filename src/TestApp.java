@@ -14,8 +14,8 @@ import manager.SessionManager;
 import manager.TourCatalog;
 import manager.UserManager; // (manager 패키지 내로 가정)
 import pages.DefaultPage;
+import pages.PackageDetailPage;
 import pages.ReviewWritePage;
-import pages.TourDetailPage1;
 import ui_kit.MainFrame;
 import ui_kit.ServiceContext; // [수정] SamplePage (TourDetailPage) 임포트
 
@@ -63,7 +63,7 @@ public class TestApp {
             mainFrame.addPage(new DefaultPage(context)); 
             
             // [수정] SamplePage (TourDetailPage) 등록
-            mainFrame.addPage(new TourDetailPage1(context));
+            mainFrame.addPage(new PackageDetailPage(context));
             mainFrame.addPage(new ReviewWritePage(context));
 
             // (실제 운영 시 예시)
