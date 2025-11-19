@@ -7,6 +7,7 @@ import model.Recommendation;
 import model.TourPackage;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -23,16 +24,16 @@ public class RecommendationManager {
     }
 
     /** 기본 전체 추천 출력 */
-    public void printRecommendations() {
-        System.out.println("\n=== 이번 주 추천 여행 패키지 ===");
-        for (Recommendation r : dao.getRecommendations()) {
-            var t = catalog.getTour(r.getTourId());
-            if (t != null) {
-                System.out.println("[패키지 " + r.getTourId() + "] "
-                        + t.getName() + " (" + t.getPlace() + ") → " + r.getReason());
-            }
-        }
-    }
+    // public void printRecommendations() {
+    //     System.out.println("\n=== 이번 주 추천 여행 패키지 ===");
+    //     // for (Recommendation r : dao.getRecommendations()) {
+    //     //     var t = catalog.getTour(r.getTourId());
+    //     //     if (t != null) {
+    //     //         System.out.println("[패키지 " + r.getTourId() + "] "
+    //     //                 + t.getName() + " (" + t.getPlace() + ") → " + r.getReason());
+    //     //     }
+    //     // }
+    // }
 
     public List<Recommendation> recommend(int userId) {
 
@@ -43,27 +44,30 @@ public class RecommendationManager {
             return dao.getRecommendations();
         }
 
-        // 2. 최근 예약한 여행 상품 ID
-        int lastTourId = myList.get(myList.size() - 1);
+        return new ArrayList<Recommendation>();
 
-        // 3. 최근 예약 상품 정보 가져오기
-        TourPackage lastTour = catalog.getTour(lastTourId);
-        if (lastTour == null) {
-            return dao.getRecommendations();
-        }
+        // // 2. 최근 예약한 여행 상품 ID
+        // int lastTourId = myList.get(myList.size() - 1);
 
-        int lastPrice = lastTour.getPrice();
-        int minPrice = lastPrice - 50000; // 5만원 아래
-        int maxPrice = lastPrice + 50000; // 5만원 위
+        // // 3. 최근 예약 상품 정보 가져오기
+        // TourPackage lastTour = catalog.getTour(lastTourId);
+        // if (lastTour == null) {
+        //     return dao.getRecommendations();
+        // }
 
-        // 4. 비슷한 가격대의 여행 패키지 추천
-        return catalog.getAllTours().stream()
-                .filter(t -> t.getPrice() >= minPrice && t.getPrice() <= maxPrice)
-                .map(t -> new Recommendation(
-                        t.getId(),
-                        "최근 예약 상품(" + lastPrice + "원)과 비슷한 가격대 추천!"
-                ))
-                .toList();
+        // int lastPrice = lastTour.price;
+        // int minPrice = lastPrice - 50000; // 5만원 아래
+        // int maxPrice = lastPrice + 50000; // 5만원 위
+
+        // // 4. 비슷한 가격대의 여행 패키지 추천
+        // return catalog.getTourIds().stream()
+        //         .map(id -> catalog.getTour(id))
+        //         .filter(t -> t.price >= minPrice && t.price <= maxPrice)
+        //         .map(t -> new Recommendation(
+        //                 t.id,
+        //                 "최근 예약 상품(" + lastPrice + "원)과 비슷한 가격대 추천!"
+        //         ))
+        //         .toList();
     }
 
 }
