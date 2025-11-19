@@ -2,14 +2,12 @@
 package ui_kit;
 
 import javax.swing.JTextArea;
-import javax.swing.JScrollPane;
 
 /**
  * 공통 AppTextArea
- * JTextArea가 아니라 JScrollPane을 상속받아, 스크롤바 자동 포함. 이게 편할듯.
  * 일단 패널에 add만 하면 거의 끝. 심플!
  */
-public class AppTextArea extends JScrollPane {
+public class AppTextArea extends AppScrollPane {
     // 실제 입력 핸들링용 인스턴스
     private final JTextArea textArea;
 
@@ -28,8 +26,8 @@ public class AppTextArea extends JScrollPane {
         setViewportView(textArea);
         setBorder(UITheme.TEXTAREA_BORDER);
         
-        setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        setVerticalScrollBarPolicy(AppScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        setHorizontalScrollBarPolicy(AppScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     }
     
     // 기본 텍스트 입력행렬 오버로딩
