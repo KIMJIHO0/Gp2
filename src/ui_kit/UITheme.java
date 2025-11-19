@@ -38,9 +38,9 @@ public class UITheme {
 
     // --- AppButton ---
     public static final Font BUTTON_FONT = FONT_BOLD; // 버튼 텍스트 폰트
-    public static final Color BUTTON_BG_COLOR = COLOR_PRIMARY; // 버튼 기본 배경색
+    public static final Color BUTTON_BG_COLOR = COLOR_BACKGROUND_LIGHT; // 버튼 기본 배경색
     public static final Color BUTTON_BG_COLOR_HOVER = COLOR_PRIMARY_DARK; // 버튼 마우스 오버 배경색
-    public static final Color BUTTON_FG_COLOR = COLOR_TEXT_ON_PRIMARY; // 버튼 텍스트 색상
+    public static final Color BUTTON_FG_COLOR = Color.BLACK; // 버튼 텍스트 색상
 
     // --- AppLabel ---
     public static final Font LABEL_FONT_NORMAL = FONT_BASE; // 일반 라벨 폰트

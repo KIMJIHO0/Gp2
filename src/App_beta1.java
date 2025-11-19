@@ -44,10 +44,11 @@ public class App_beta1 {
 
             // --- 1. DAO 계층 생성 ---
             // repository 폴더의 DAO 구현체 사용
-            UserDAO userDAO = new UserRepository("src/data/UserData.txt");
+            // 상품정보 외에 리뷰 등은 임시로 추가
+            UserDAO userDAO = new UserRepository("src/test_data/UserData.txt");
             TourDAO tourDAO = new TourRepository("src/data/TourPackageData.txt");
-            ReservationDAO reservationDAO = new ReservationRepository("src/data/ReservationData.txt");
-            ReviewDAO reviewDAO = new ReviewRepository("src/data/ReviewData.txt");
+            ReservationDAO reservationDAO = new ReservationRepository("src/test_data/ReservationData.txt");
+            ReviewDAO reviewDAO = new ReviewRepository("src/test_data/ReviewData.txt");
             
             // RecommendationDAO는 구현체가 없으므로, 임시 익명 클래스로 생성
             RecommendationDAO recommendationDAO = new RecommendationDAO() {
@@ -76,7 +77,7 @@ public class App_beta1 {
 
             // --- 4. 임시 세션 추가 (0000 계정) ---
             // UserData.txt의 '0000 admin' 사용
-            sessionManager.login(0L);
+            sessionManager.login(9124L);
 
             // --- 5. MainFrame 생성 (UI 셸) ---
             MainFrame mainFrame = new MainFrame();
