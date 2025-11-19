@@ -1,12 +1,3 @@
-/**
- * 여행 패키지 정보들을 목록화하여 보여주고, 좌측 메뉴도 함께 제공하는 페이지.
- * JList/AppList 대신 AppScrollPane을 이용해 직접 구현
- * 클릭 가능한 TourBanner 컴포넌트 목록을 구현합니다.
- */
-
-// Todo
-// 스크롤 패널 CardLayout으로 씌우고 좌측 메뉴 클릭에 따라 전환되도록
-
 package pages;
 
 import ui_kit.*;
@@ -27,16 +18,33 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.event.ActionListener;
 import java.time.LocalDate;
-
+import java.lang.Math;
 import javax.swing.BoxLayout;
 import javax.swing.ScrollPaneConstants;
 
 
 public class CatalogPage extends AppPage {
     public static final String ID = "catalog";
+
+    // --- 필드 정의 ---
+    private static final String[] menuIds = new String[]{"tours", "reserves", "recommends"};
+    private Sidebar sideNav;
+    private SearchBar searchBar;
+    
+    private Map<String, AppScrollPane> packageLists = new HashMap<>(); 
+    private AppPanel listContainer;
+    private CardLayout listLayout;
+    
+    private String activeMenuId = menuIds[0]; 
+    private Map<String, List<TourPackage>> cachedTourData = new HashMap<>(); 
+    private Map<Integer, Reservation> reservationMap = new HashMap<>();
+
 
     public CatalogPage(ServiceContext ctx){ 
         super(new BorderLayout(), ctx);
@@ -46,15 +54,32 @@ public class CatalogPage extends AppPage {
     @Override
     public String getPageId(){ return CatalogPage.ID; }
 
-    private static final String[] menuIds = new String[]{"tours", "reserves", "recommends"};
-    private Sidebar sideNav;
-    private SearchBar searchBar;
-    private Map<String, AppScrollPane> packageLists = new HashMap<>(); // 4. 패키지 배너들을 담을 컨테이너 패널
-    private AppPanel listContainer;
-    private CardLayout listLayout;
+
+    /**
+     * 페이지가 화면에 표시될 때 호출됩니다.
+     * context 파라미터에 따라 초기 진입 탭을 결정하고 렌더링합니다.
+     * * @param context 1(기본): 목록, 2: 예약 내역, 3: 추천 목록
+     */
+    @Override
+    public void onPageShown(Object context){
+        String targetMenuId = menuIds[0]; // 기본값: 일반 목록 (1 또는 null/그 외)
+
+        if(context instanceof Integer){
+            int mode = (Integer) context;
+            if(mode == 2) {
+                targetMenuId = menuIds[1]; // 예약 내역
+            } else if(mode == 3) {
+                targetMenuId = menuIds[2]; // 추천 목록
+            }
+        }
+        
+        // changeList는 일반 목록에 대해 캐싱된 데이터를 사용하고,
+        // 예약/추천 목록은 최신 데이터를 로드하므로 효율성과 데이터 정합성을 모두 보장합니다.
+        changeList(targetMenuId);
+    }
+
 
     public void init(){
-        // 본인 스타일링 (페이지 전체의 기본 배경색)
         setOpaque(true);
         setBackground(UITheme.PANEL_BACKGROUND_COLOR);
 
@@ -63,99 +88,119 @@ public class CatalogPage extends AppPage {
         sideNav.addMenu("여행 패키지 목록", e -> changeList(menuIds[0]));
         sideNav.addMenu("예약 내역 확인", e -> changeList(menuIds[1]));
         sideNav.addMenu("추천 패키지", e -> changeList(menuIds[2]));
-        sideNav.setLogoutCallback(null);
+        sideNav.setLogoutCallback(null); 
 
         add(sideNav, BorderLayout.WEST);
 
-        // --- 2. 메인 콘텐츠 패널 (신규 코드) ---
-        // (CENTER 영역은 SearchBar와 List, 두 개로 나뉘므로 새 패널 필요)
-        AppPanel mainContentPanel = new AppPanel(new BorderLayout(0, 45)); // 수직 갭 10px
+        // --- 2. 메인 콘텐츠 패널 ---
+        AppPanel mainContentPanel = new AppPanel(new BorderLayout(0, 45));
         mainContentPanel.setBackground(UITheme.TRANSPARENT);
-
-        // "위/좌/우 패딩"을 위해 UITheme의 공통 패널 보더 사용
         mainContentPanel.setBorder(UITheme.CATALOG_PANEL_BORDER);
 
 
-        // --- 3. 검색창 (mainContentPanel의 NORTH) ---
+        // --- 3. 검색창 ---
         searchBar = new SearchBar();
-        searchBar.setRegions(new String[]{"지역"});
-        searchBar.setPrices(new String[]{"가격"});
         mainContentPanel.add(searchBar, BorderLayout.NORTH);
 
-        // --- 4. 패키지 목록 (mainContentPanel의 CENTER) ---
-        // CardLayout으로 여러 목록을 교체 가능하도록
+        // --- 4. 패키지 목록 컨테이너 ---
         listLayout = new CardLayout();
         listContainer = new AppPanel(listLayout);
         listContainer.setBackground(UITheme.TRANSPARENT);
         
-        // 페이지들 생성 및 추가
         for(var menu : menuIds){
             AppScrollPane listPanel = createListPanel();
             packageLists.put(menu, listPanel);
             listContainer.add(menu, listPanel);
         }
-        listLayout.show(listContainer, menuIds[0]);
-
         mainContentPanel.add(listContainer, BorderLayout.CENTER);
 
 
-        // 좌측 메뉴에 Card 전환 기능 콜백 추가
-
-
-        // --- 5. 완성된 메인 패널을 페이지의 CENTER에 추가 ---
+        // --- 5. 페이지 조립 완료 ---
         add(mainContentPanel, BorderLayout.CENTER);
 
         applySearchCallbacks();
-        renderNormalBanners(getViewOfList(menuIds[0]));
-        changeList(menuIds[0]);
+        changeList(menuIds[0]); 
     }
 
-    // 렌더링되는 목록 유형 전환
-    private List<TourBanner> renderedBanners = new ArrayList<>();
+
     private AppPanel getViewOfList(String menuId){
-        try {
-            return (AppPanel)packageLists.get(menuId).getViewport().getView();
-        } catch(Exception e){
-            throw new Error("Undefined menu: " + menuId);
-            return null;
+        if (!packageLists.containsKey(menuId)) {
+            throw new Error("Undefined menu ID: " + menuId);
         }
+        return (AppPanel) packageLists.get(menuId).getViewport().getView();
     }
+    
     protected void changeList(String id){
-        for(String menuId : menuIds){
-            if(id.equals(menuId)){
-                // 1. 일반 패키지 목록
-                if(id.equals(menuIds[0])){
-                    // 최초 1회만 렌더링
-                    // renderNormalBanners(getViewOfList(id));
-                    listLayout.show(listContainer, id);
-                }
-                // 2. 예약 내역
-                else if(id.equals(menuIds[1])){
-                    // 매번 재렌더링
-                    renderReservations(getViewOfList(id));
-                    listLayout.show(listContainer, id);
-                }
-                // 3. 추천 패키지
-                else if(id.equals(menuIds[2])){
+        this.activeMenuId = id; 
+        
+        // 탭 전환 시 필터 초기화
+        searchBar.clearFilters();
+        // 기본값 재설정 (데이터 로드 전 임시)
+        searchBar.setRegions(new String[]{"지역"});
+        searchBar.setPrices(new String[]{"가격"});
 
+        TourCatalog catalog = context.get(TourCatalog.class);
+        SessionManager session = context.get(SessionManager.class);
+
+        // 1. 일반 목록
+        if(id.equals(menuIds[0])){
+            if (!cachedTourData.containsKey(id)) {
+                List<TourPackage> allTours = new ArrayList<>();
+                for(int tourId : catalog.getTourIds()){
+                    allTours.add(catalog.getTour(tourId));
                 }
-                // 기타
-                else
-                    throw new Error("Undefined menu: " + id);
-                break;
+                cachedTourData.put(id, allTours);
             }
+            initComboboxFilters(); 
         }
+        // 2. 예약 내역
+        else if(id.equals(menuIds[1])){
+            List<TourPackage> reservedPackages = new ArrayList<>();
+            reservationMap.clear();
+
+            if(session.isLoggedIn()){
+                ReservationManager reserves = context.get(ReservationManager.class);
+                List<Integer> reservedIds = reserves.getListByUserId(session.getCurrentUserId().intValue());
+                
+                for(int rId : reservedIds){
+                    Reservation r = reserves.getReservation(rId);
+                    if(r != null) {
+                        TourPackage t = catalog.getTour(r.tour_id);
+                        if(t != null){
+                            reservedPackages.add(t);
+                            reservationMap.put(t.id, r);
+                        }
+                    }
+                }
+            }
+            cachedTourData.put(id, reservedPackages);
+        }
+        // 3. 추천 패키지
+        else if(id.equals(menuIds[2])){
+            List<TourPackage> recommendedPackages = new ArrayList<>();
+            if(session.isLoggedIn()){
+                RecommendationManager recommender = context.get(RecommendationManager.class);
+                var recommendations = recommender.recommend(session.getCurrentUserId().intValue());
+                for(var rec : recommendations){
+                    TourPackage t = catalog.getTour(rec.getId());
+                    if(t != null) recommendedPackages.add(t);
+                }
+            }
+            cachedTourData.put(id, recommendedPackages);
+            initComboboxFilters();
+        }
+        
+        reRenderBanners(id); 
+        listLayout.show(listContainer, id);
     }
 
 
-    // TourBanner들 리스트 형태로 넣을 배너
     private AppScrollPane createListPanel(){
         var panel = new AppPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(UITheme.TRANSPARENT);
 
-        // 스크롤 기능 추가
-        var scroller = new AppScrollPane(panel); // 래핑
+        var scroller = new AppScrollPane(panel); 
         scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scroller.getVerticalScrollBar().setUnitIncrement(16);
@@ -163,150 +208,173 @@ public class CatalogPage extends AppPage {
         return scroller;
     }
 
-    /**
-     * 검색바 콜백 등록
-     * 현재 리스트업된 결과들 필터링
-     */
-    private void applySearchCallbacks(){
-        searchBar.addSearchListener(e -> {
-            
-        });
+    private boolean isReservationCompleted(LocalDate startDate, int duration) {
+        LocalDate today = LocalDate.now();
+        return startDate.plusDays(duration).isBefore(today); 
+    }
 
+    private boolean isPriceInRange(int price, String rangeStr) {
+        try {
+            if (rangeStr.contains("~")) {
+                String[] parts = rangeStr.replace("만원", "").trim().split("~");
+                int min = Integer.parseInt(parts[0].trim()) * 10000;
+                int max = Integer.parseInt(parts[1].trim()) * 10000;
+                return price >= min && price < max; 
+            } else if (rangeStr.contains("이상")) {
+                String part = rangeStr.replace("만원 이상", "").trim();
+                int min = Integer.parseInt(part) * 10000;
+                return price >= min;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
+    }
+
+
+    private void applySearchCallbacks(){
+        searchBar.addSearchListener(e -> reRenderBanners(activeMenuId));
         searchBar.addResetListener(e -> {
             searchBar.clearFilters();
-            // 필터 초기화 반영
+            reRenderBanners(activeMenuId);
         });
     }
 
     /**
-     * 1. 일반 목록 렌더링
-     * @param panel 적용할 패널
+     * 현재 데이터 기반 필터 옵션 생성
      */
-    private void renderNormalBanners(AppPanel panel){
-        TourCatalog catalog = context.get(TourCatalog.class);
-        for(final int id : catalog.getTourIds()){
-            TourPackage tour = catalog.getTour(id);
-            TourBanner banner = new TourBanner(
-                tour.name,
-                tour.place,
-                (tour.day_long-1)+"박 "+tour.day_long+"일",
-                (tour.price/10000)+"만원",
-                RateToStar.stringify((int)Math.round(context.get(ReviewManager.class).getAverageRateOfTour(id)))
-            );
+    private void initComboboxFilters(){
+        List<TourPackage> data = cachedTourData.getOrDefault(activeMenuId, new ArrayList<>());
 
-            banner.addDetailButtonListener(e -> {
-                // System.out.println("상세보기 클릭: " + tour.name);
-                navigateTo("tourDetail", tour.id);
-            });
-
-            System.out.println(tour.name);
-            panel.add(banner);
-        }
-    }
-
-    /**
-     * 2. 예약 내역 렌더링
-     * @param panel 적용할 패널
-     */
-    private void renderReservations(AppPanel panel){
-        TourCatalog catalog = context.get(TourCatalog.class);
-        ReservationManager reserves = context.get(ReservationManager.class);
-        SessionManager session = context.get(SessionManager.class);
-        if(!session.isLoggedIn())
+        if (data.isEmpty()) {
+            searchBar.setRegions(new String[]{"지역"});
+            searchBar.setPrices(new String[]{"가격"});
             return;
+        }
 
+        // 1. 지역 목록
+        Set<String> regionSet = new HashSet<>();
+        for(TourPackage p : data) {
+            regionSet.add(p.place);
+        }
+        List<String> regions = new ArrayList<>(regionSet);
+        regions.add(0, "지역");
+        searchBar.setRegions(regions.toArray(new String[0]));
+
+        // 2. 가격 구간
+        int maxPrice = 0;
+        for(TourPackage p : data) {
+            if(p.price > maxPrice) maxPrice = p.price;
+        }
         
-        LocalDate today = LocalDate.now();
-        for(final int id : reserves.getListByUserId(session.getCurrentUserId().intValue())){
-            TourPackage tour = catalog.getTour(id);
-            Reservation reserve = reserves.getReservation(id);
-            boolean isCompleted = today.isAfter(reserve.start_date.plusDays(tour.day_long));
-    
-            ReservationBanner banner = new ReservationBanner(
-                tour.name,
-                tour.place,
-                (tour.day_long-1)+"박 "+tour.day_long+"일",
-                (tour.price/10000)+"만원",
-                RateToStar.stringify((int)Math.round(context.get(ReviewManager.class).getAverageRateOfTour(id))),
-                isCompleted,
-                e -> navigateTo("tourDetail", tour.id),
-                isCompleted
-                    ? (e -> navigateTo("reviewWrite", tour.id))
-                    : (e -> {
-                        reserves.cancel(id);
-                        changeList(menuIds[1]); // 재렌더링 유도
-                    })
-            );
+        int N = data.size();
+        int K = (int) Math.round(1 + 3.322 * (N > 0 ? Math.log10(N) : 1));
+        if (K < 3) K = 3;
 
-            System.out.println(tour.name);
-            panel.add(banner);
+        int rangeVal = (int) Math.ceil((double) maxPrice / 10000);
+        int width = (int) Math.ceil((double) rangeVal / K);
+        if (width == 0) width = 10;
+
+        List<String> prices = new ArrayList<>();
+        prices.add("가격");
+        for (int i = 0; i < K; i++) {
+            int start = i * width;
+            int end = (i + 1) * width;
+            if (start >= rangeVal) break;
+            if (i == K - 1 || end >= rangeVal) {
+                prices.add(start + "만원 이상");
+            } else {
+                prices.add(start + "만원 ~ " + end + "만원");
+            }
         }
+        searchBar.setPrices(prices.toArray(new String[0]));
+
+        // [Fix] 콤보박스 변경 시 즉시 필터링 적용 (필터 미동작 해결)
+        searchBar.addFilterListener(e -> reRenderBanners(activeMenuId));
     }
-    
-    /**
-     * 3. 추천 목록 렌더링
-     * @param panel 적용할 패널
-     */
-    private void renderRecommendations(AppPanel panel){
-        TourCatalog catalog = context.get(TourCatalog.class);
-        RecommendationManager recommender = context.get(RecommendationManager.class);
-        SessionManager session = context.get(SessionManager.class);
-        if(!session.isLoggedIn())
+
+
+    private void reRenderBanners(String menuId) {
+        AppPanel targetPanel = getViewOfList(menuId);
+        targetPanel.removeAll(); 
+        
+        List<TourPackage> sourceData = cachedTourData.getOrDefault(menuId, new ArrayList<>());
+        
+        // [Fix] 검색어 앞뒤 공백 제거 (검색 오류 방지)
+        String keyword = searchBar.getSearchText().trim().toLowerCase();
+        
+        // [Fix] null 체크 추가 (NPE 방지)
+        String regionFilter = searchBar.getSelectedRegion();
+        if(regionFilter == null) regionFilter = "지역";
+
+        String priceFilter = searchBar.getSelectedPriceRange();
+        if(priceFilter == null) priceFilter = "가격";
+        
+        List<TourPackage> filtered = new ArrayList<>();
+        
+        for(TourPackage tour : sourceData){
+            boolean matchKeyword = keyword.isEmpty() || tour.name.toLowerCase().contains(keyword);
+            boolean matchRegion = regionFilter.equals("지역") || tour.place.equals(regionFilter);
+            boolean matchPrice = priceFilter.equals("가격") || isPriceInRange(tour.price, priceFilter);
+
+            if(matchKeyword && matchRegion && matchPrice)
+                filtered.add(tour);
+        }
+
+        renderBanners(targetPanel, filtered, menuId);
+
+        targetPanel.revalidate();
+        targetPanel.repaint();
+    }
+
+
+    private void renderBanners(AppPanel panel, List<TourPackage> data, String menuId) {
+        ReviewManager reviewManager = context.get(ReviewManager.class);
+        ReservationManager reservationManager = context.get(ReservationManager.class);
+
+        if (data.isEmpty()) {
+            // [Fix] AppLabel 생성자 오류 수정 (폰트는 setter로 설정)
+            AppLabel emptyLabel = new AppLabel("표시할 항목이 없습니다.");
+            panel.add(emptyLabel);
             return;
+        }
+        
+        for (TourPackage tour : data) {
+            String rating = RateToStar.stringify((int)Math.round(reviewManager.getAverageRateOfTour(tour.id)));
+            String duration = (tour.day_long - 1) + "박 " + tour.day_long + "일";
+            String priceStr = (tour.price / 10000) + "만원";
+            
+            ActionListener detailAction = e -> navigateTo("tourDetail", tour.id);
 
-        for(final int id : recommender.){
-            TourPackage tour = catalog.getTour(id);
-            TourBanner banner = new TourBanner(
-                tour.name,
-                tour.place,
-                (tour.day_long-1)+"박 "+tour.day_long+"일",
-                (tour.price/10000)+"만원",
-                RateToStar.stringify((int)Math.round(context.get(ReviewManager.class).getAverageRateOfTour(id)))
-            );
+            if (menuId.equals(menuIds[1])) {
+                Reservation reserve = reservationMap.get(tour.id);
+                if (reserve == null) continue;
 
-            banner.addDetailButtonListener(e -> {
-                // System.out.println("상세보기 클릭: " + tour.name);
-                navigateTo("tourDetail", tour.id);
-            });
+                boolean isCompleted = isReservationCompleted(reserve.start_date, tour.day_long);
+                
+                ActionListener secondaryAction;
+                if (isCompleted) {
+                    secondaryAction = e -> navigateTo("reviewWrite", tour.id);
+                } else {
+                    secondaryAction = e -> {
+                        reservationManager.cancel(reserve.id);
+                        changeList(menuIds[1]); 
+                    };
+                }
 
-            System.out.println(tour.name);
-            panel.add(banner);
+                ReservationBanner banner = new ReservationBanner(
+                    tour.name, tour.place, duration, priceStr, rating,
+                    isCompleted, detailAction, secondaryAction
+                );
+                panel.add(banner);
+            } 
+            else {
+                TourBanner banner = new TourBanner(
+                    tour.name, tour.place, duration, priceStr, rating
+                );
+                banner.addDetailButtonListener(detailAction);
+                panel.add(banner);
+            }
         }
     }
-
-
-    /**
-     * 예시용 TourBanner를 패널에 추가하는 헬퍼 메서드
-     * @param panel 배너를 추가할 패널
-     */
-    // private void addSampleBanners(AppPanel panel) {
-    //     // String[] sampleImages = {
-    //     //     "res/icons/search.png", // (실제 파일 경로로 변경 필요)
-    //     //     "res/icons/search.png",
-    //     //     "res/icons/search.png"
-    //     // };
-    //     String[] ratings = {"★★★★☆", "★★★★★", "★★★☆☆", "★★★★☆"};
-
-    //     for (int i = 0; i < 15; i++) {
-    //         TourBanner banner = new TourBanner(
-    //             "[특가] " + (i % 3 == 0 ? "제주" : "부산") + " 힐링 " + (i%2 + 2) + "박 " + (i%2 + 3) + "일",
-    //             "제주", 
-    //             (i%2 + 2) + "박 " + (i%2 + 3) + "일", 
-    //             (59 + i*3) + "만원", 
-    //             ratings[i % 4]
-    //         );
-            
-    //         // 썸네일 설정
-    //         // banner.setThumbnail(sampleImages[i % 3]);
-            
-    //         // 콜백 연결 (람다에서 배너 참조)
-    //         int c = i;
-    //         banner.addDetailButtonListener(e -> {
-    //             System.out.println("상세보기 클릭: " + c);
-    //             // TODO: 상세 페이지로 이동 (ServiceContext.getInstance().navigate(...))
-    //         });
-            
-    //         panel.add(banner);
-    //     }
-    // }
 }

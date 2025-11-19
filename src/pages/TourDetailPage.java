@@ -111,7 +111,7 @@ public class TourDetailPage extends AppPage {
     private void initListeners() {
         // "목록으로" 버튼 클릭 -> "tourList" 페이지로 데이터 없이 이동
         backToListButton.addActionListener(e -> {
-            navigateTo("tourList"); // 1. navigateTo (데이터 없음)
+            navigateTo("catalog", 1); // 1. navigateTo (데이터 없음)
         });
 
         // "예약하기" 버튼 클릭 -> 예약 실행
@@ -237,7 +237,7 @@ public class TourDetailPage extends AppPage {
                 JOptionPane.showMessageDialog(this, "예약 성공! 예약 ID: " + reservationId);
                 
                 // 6. navigateTo (데이터 포함): 예약 ID를 들고 "결과" 페이지로 이동
-                navigateTo("reservationResult", reservationId);
+                navigateTo("catalog", 2);
             },
             (error) -> {
                 // [EDT - 실패]

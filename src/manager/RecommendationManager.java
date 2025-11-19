@@ -3,6 +3,7 @@ package manager;
 import dao.RecommendationDAO;
 import model.Recommendation;
 import java.util.List;
+import java.util.ArrayList;
 
 //추천 데이터 처리
 public class RecommendationManager {
@@ -18,5 +19,10 @@ public class RecommendationManager {
         for (Recommendation r : list) {
             System.out.println(r);
         }
+    }
+
+    public List<Recommendation> recommend(int userId){
+        // Todo
+        return new ArrayList<>();
     }
 }

@@ -8,12 +8,12 @@ package pages.component;
 
 import ui_kit.AppPanel;
 import ui_kit.AppButton;
-import ui_kit.AppComboBox; // 가정: 콤보박스 컴포넌트
-import ui_kit.AppTextField; // 가정: 텍스트필드 컴포넌트
+import ui_kit.AppComboBox; 
+import ui_kit.AppTextField;
 import ui_kit.UITheme;
 
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon; // 아이콘 사용
+import javax.swing.ImageIcon;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -46,20 +46,14 @@ public class SearchBar extends AppPanel {
         setBorder(UITheme.SEARCH_BAR_PADDING);
 
         // 2. WEST 영역: GridBagLayout으로 변경
-        // AppPanel westPanel = new AppPanel(new FlowLayout(FlowLayout.LEFT, 5, 0)); // (X)
-        AppPanel westPanel = new AppPanel(new GridBagLayout()); // (O)
+        AppPanel westPanel = new AppPanel(new GridBagLayout()); 
         westPanel.setBackground(UITheme.TRANSPARENT);
 
         // GridBagLayout의 설정을 위한 GridBagConstraints
         GridBagConstraints gbc = new GridBagConstraints();
-        
-        // GridBagLayout의 기본 앵커는 CENTER이므로 컴포넌트들이 수직 중앙 정렬됨
-        // gbc.anchor = GridBagConstraints.CENTER; // (이것이 기본값)
-
-        // FlowLayout의 hgap(5)을 insets(오른쪽 여백)로 대체
         gbc.insets = new Insets(0, 0, 0, 5); 
 
-        // 2-1. 콤보박스들
+        // 2-1. 콤보박스들 (초기값 설정)
         regionComboBox = createComboBox(new String[]{"지역"});
         priceComboBox = createComboBox(new String[]{"가격대"});
         
@@ -73,7 +67,7 @@ public class SearchBar extends AppPanel {
         var searchPanel = new AppPanel(new BorderLayout());
         searchPanel.setBackground(Color.WHITE);
 
-        // 3-1. 검색 아이콘 버튼 (마지막 컴포넌트이므로 오른쪽 여백 0)
+        // 3-1. 검색 아이콘 버튼
         searchButton = createIconButton(UITheme.SEARCH_ICON_PATH);
         searchPanel.add(searchButton, BorderLayout.WEST);
 
@@ -101,77 +95,61 @@ public class SearchBar extends AppPanel {
 
     /**
      * "지역" 콤보박스의 목록을 설정합니다.
-     * @param regions 콤보박스에 표시할 문자열 배열
+     * 설정 후 자동으로 첫 번째 항목(기본값)을 선택합니다.
      */
     public void setRegions(String[] regions) {
-        // 기존 아이템을 모두 제거합니다.
         regionComboBox.removeAllItems();
-        
-        // 새 아이템을 추가합니다.
         if (regions != null) {
             for (String region : regions) {
                 regionComboBox.addItem(region);
+            }
+            // [Fix] 아이템 재설정 후 0번 인덱스(제목: "지역") 선택 강제
+            if (regionComboBox.getItemCount() > 0) {
+                regionComboBox.setSelectedIndex(0);
             }
         }
     }
 
     /**
      * "가격대" 콤보박스의 목록을 설정합니다.
-     * @param prices 콤보박스에 표시할 문자열 배열
+     * 설정 후 자동으로 첫 번째 항목(기본값)을 선택합니다.
      */
     public void setPrices(String[] prices) {
-        // 기존 아이템을 모두 제거합니다.
         priceComboBox.removeAllItems();
-        
-        // 새 아이템을 추가합니다.
         if (prices != null) {
             for (String price : prices) {
                 priceComboBox.addItem(price);
+            }
+            // [Fix] 아이템 재설정 후 0번 인덱스(제목: "가격") 선택 강제
+            if (priceComboBox.getItemCount() > 0) {
+                priceComboBox.setSelectedIndex(0);
             }
         }
     }
 
     /**
-     * 아이콘 버튼 공통 스타일 생성 (배경/테두리 투명)
-     * + 아이콘 크기 조절 로직 추가
-     * @param iconPath 아이콘 파일 경로
-     * @return 스타일이 적용된 AppButton
+     * 아이콘 버튼 공통 스타일 생성
      */
     private AppButton createIconButton(String iconPath) {
-        AppButton iconButton = new AppButton("", false); // AppButton(text, autoStyling=false)
+        AppButton iconButton = new AppButton("", false); 
         
-        // --- 아이콘 크기 조절 로직 ---
         final int ICON_SIZE = UITheme.SEARCH_BAR_ICON_SIZE;
-        
         try {
             ImageIcon originalIcon = new ImageIcon(iconPath);
-            // ImageIcon에서 Image 추출
             Image originalImage = originalIcon.getImage();
-            // Image 크기 조절 (SCALE_SMOOTH로 부드럽게)
             Image scaledImage = originalImage.getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH);
-            // 조절된 Image로 새 ImageIcon 생성
             ImageIcon scaledIcon = new ImageIcon(scaledImage);
-
             iconButton.setIcon(scaledIcon);
-            
         } catch (Exception e) {
-            // 아이콘 로드 실패 시 텍스트로 대체
-            e.printStackTrace(); // 디버깅을 위해 로그 출력
+            // 아이콘 로드 실패 시 텍스트 대체
             if (iconPath.contains("search")) iconButton.setText("검색");
             if (iconPath.contains("reset")) iconButton.setText("초기화");
         }
         
-        // 아이콘 크기에 맞춰 버튼의 '선호하는 크기'를 고정 (테두리/여백 없는 아이콘 버튼)
-        // iconButton.setPreferredSize(new Dimension(ICON_SIZE, ICON_SIZE));
-        // 패딩 못 넣어서 삭제
-        
-        // Sidebar 버튼처럼 투명하게 만듦
         iconButton.setOpaque(false);
         iconButton.setContentAreaFilled(false);
         iconButton.setBorderPainted(false);
         iconButton.setFocusPainted(false);
-
-        // 살짝 padding
         iconButton.setBorder(BorderFactory.createEmptyBorder(4,4,4,4));
         
         return iconButton;
@@ -180,40 +158,46 @@ public class SearchBar extends AppPanel {
 
     // --- 외부 콜백 및 데이터 접근 ---
 
-    /**
-     * 검색 버튼 클릭 또는 텍스트필드 Enter 시 호출될 콜백을 등록합니다.
-     * @param callback 부모가 전달할 실제 검색 로직
-     */
     public void addSearchListener(ActionListener callback) {
         searchButton.addActionListener(callback);
         searchTextField.addActionListener(callback);
     }
     
-    /**
-     * 초기화(화살표) 버튼 클릭 시 호출될 콜백을 등록합니다.
-     * @param callback 부모가 전달할 초기화 로직
-     */
     public void addResetListener(ActionListener callback) {
         resetButton.addActionListener(callback);
     }
 
-    // 부모 컴포넌트가 검색 파라미터를 가져갈 수 있도록 Getter 제공
+    /**
+     * [Fix] 콤보박스 변경 감지 리스너 추가
+     * 지역이나 가격 변경 시 즉시 필터링을 수행하기 위해 필요합니다.
+     */
+    public void addFilterListener(ActionListener callback) {
+        regionComboBox.addActionListener(callback);
+        priceComboBox.addActionListener(callback);
+    }
+
     public String getSelectedRegion() {
-        return (String) regionComboBox.getSelectedItem();
+        Object selected = regionComboBox.getSelectedItem();
+        return selected != null ? (String) selected : "지역";
     }
 
     public String getSelectedPriceRange() {
-        return (String) priceComboBox.getSelectedItem();
+        Object selected = priceComboBox.getSelectedItem();
+        return selected != null ? (String) selected : "가격"; // [Fix] null 방지
+    }
+    
+    // CatalogPage 호환성용
+    public String getSelectedPrice() {
+        return getSelectedPriceRange();
     }
 
     public String getSearchText() {
         return searchTextField.getText();
     }
 
-    // (필요시) 콤보박스나 텍스트필드를 초기화하는 public 메서드
     public void clearFilters() {
-        regionComboBox.setSelectedIndex(0);
-        priceComboBox.setSelectedIndex(0);
+        if(regionComboBox.getItemCount() > 0) regionComboBox.setSelectedIndex(0);
+        if(priceComboBox.getItemCount() > 0) priceComboBox.setSelectedIndex(0);
         searchTextField.setText("");
     }
 }
