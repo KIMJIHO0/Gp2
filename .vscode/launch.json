@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TestApp",
+            "request": "launch",
+            "mainClass": "TestApp",
+            "projectName": "Gp2_c69302aa"
+        },
+        {
+            "type": "java",
             "name": "Launch Current File",
             "request": "launch",
             "mainClass": "${file}"

@@ -1,29 +1,24 @@
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-
-// 1. DAO 인터페이스 및 구현체 임포트
-import dao.UserDAO;
-import dao.TourDAO;
-import dao.ReservationDAO;
-import dao.ReviewDAO;
-import adapters.memory.MemUserDAO;
-import adapters.memory.MemTourDAO;
 import adapters.memory.MemReservationDAO;
 import adapters.memory.MemReviewDAO;
-
-// 2. Manager 임포트
-import manager.UserManager;
-import manager.TourCatalog;
+import adapters.memory.MemTourDAO;
+import adapters.memory.MemUserDAO;
+import dao.ReservationDAO;
+import dao.ReviewDAO;
+import dao.TourDAO;
+import dao.UserDAO;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import manager.ReservationManager;
 import manager.ReviewManager;
-import manager.SessionManager; // (manager 패키지 내로 가정)
-
-// 3. UI-Kit 및 페이지 임포트
+import manager.SessionManager;
+import manager.TourCatalog;
+import manager.UserManager; // (manager 패키지 내로 가정)
+import pages.DefaultPage;
+import pages.PackageDetailPage;
+import pages.ReviewWritePage;
 import ui_kit.MainFrame;
 import ui_kit.ServiceContext;
-import ui_kit.AppPage;
-import pages.DefaultPage;
-import pages.TourDetailPage; // [수정] SamplePage (TourDetailPage) 임포트
+
 
 /**
  * 애플리케이션의 메인 엔트리 클래스입니다.
@@ -32,7 +27,6 @@ import pages.TourDetailPage; // [수정] SamplePage (TourDetailPage) 임포트
 public class TestApp {
 
     public static void main(String[] args) {
-        // Swing 앱은 항상 Event Dispatch Thread(EDT)에서 실행해야 합니다.
         SwingUtilities.invokeLater(() -> {
             
             // --- 1. DAO 계층 생성 (메모리 기반 임시 구현체) ---
@@ -68,8 +62,9 @@ public class TestApp {
             mainFrame.addPage(new DefaultPage(context)); 
             
             // [수정] SamplePage (TourDetailPage) 등록
-            mainFrame.addPage(new TourDetailPage(context));
-            
+            mainFrame.addPage(new PackageDetailPage(context));
+            mainFrame.addPage(new ReviewWritePage(context));
+
             // (실제 운영 시 예시)
             // mainFrame.addPage(new LoginPage(context));
             // mainFrame.addPage(new HomePage(context));

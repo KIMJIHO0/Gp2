@@ -344,7 +344,7 @@ public class CatalogPage extends AppPage {
             String duration = (tour.day_long - 1) + "박 " + tour.day_long + "일";
             String priceStr = (tour.price / 10000) + "만원";
             
-            ActionListener detailAction = e -> navigateTo("tourDetail", tour.id);
+            ActionListener detailAction = e -> navigateTo("tourDetail", Long.valueOf(tour.id));
 
             if (menuId.equals(menuIds[1])) {
                 Reservation reserve = reservationMap.get(tour.id);
@@ -354,7 +354,7 @@ public class CatalogPage extends AppPage {
                 
                 ActionListener secondaryAction;
                 if (isCompleted) {
-                    secondaryAction = e -> navigateTo("reviewWrite", tour.id);
+                    secondaryAction = e -> navigateTo("reviewWrite", Long.valueOf(tour.id));
                 } else {
                     secondaryAction = e -> {
                         reservationManager.cancel(reserve.id);
