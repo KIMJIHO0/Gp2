@@ -169,5 +169,9 @@ public class UITheme {
     public static final Color TOUR_BANNER_SUB_FG_COLOR = Color.BLACK; // 부가정보 텍스트 색상
     public static final Border TOUR_BANNER_PADDING = BorderFactory.createEmptyBorder(16, 16, 16, 16); // 전체 배너 패널의 내부 여백 (상하좌우 16)
     public static final Color TOUR_BANNER_BG_COLOR = new Color(0, 0, 0, 0); // 전체 배너 배경색 (투명)
-    public static final Color TOUR_BANNER_DETAILBTN_COLOR = new Color(249,249,249);
+    public static final Color TOUR_BANNER_DETAILBTN_COLOR = new Color(249,249,249); // 상세보기 버튼색
+    public static final Dimension TOUR_BANNER_EAST_BTN_SIZE = new Dimension(72, 27);
+    // --- component - ReservationBanner(TourBanner 확장)
+    public static final Color RESERVE_BANNER_RESERVE_BTN_COLOR = TOUR_BANNER_DETAILBTN_COLOR;
+    public static final Color RESERVE_BANNER_CANCEL_BTN_COLOR = new Color(236, 136, 136);
 }

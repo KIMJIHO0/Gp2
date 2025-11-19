@@ -25,7 +25,7 @@ public class TourBanner extends AppPanel {
     private AppLabel thumbnailLabel;
     private AppLabel titleLabel;
     private AppLabel subLabel;
-    private AppButton detailButton;
+    protected AppButton detailButton;
 
     /**
      * 3. (제목, 지역 기간, 가격, 평점)을 받아 생성됨.
@@ -73,11 +73,15 @@ public class TourBanner extends AppPanel {
 
         // 6. EAST: 버튼 ("상세보기")
         // (수직 중앙 정렬을 위해 SearchBar에서 사용한 GridBagLayout 래퍼 사용)
+        initEast();
+    }
+    protected void initEast(){
         AppPanel buttonWrapper = new AppPanel(new GridBagLayout());
         buttonWrapper.setBackground(UITheme.TRANSPARENT);
 
         detailButton = new AppButton("상세보기", false); // AppButton(text, autoStyling=true)
         detailButton.setBackground(UITheme.TOUR_BANNER_DETAILBTN_COLOR);
+        detailButton.setPreferredSize(UITheme.TOUR_BANNER_EAST_BTN_SIZE);
 
         buttonWrapper.add(detailButton, new GridBagConstraints()); // 중앙에 배치
         add(buttonWrapper, BorderLayout.EAST);

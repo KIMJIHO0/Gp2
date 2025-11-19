@@ -12,13 +12,25 @@ package pages;
 import ui_kit.*;
 import util.RateToStar;
 import pages.component.Sidebar;
+import pages.component.ReservationBanner;
 import pages.component.SearchBar;
 import pages.component.TourBanner;
+import manager.RecommendationManager;
+import manager.ReservationManager;
 import manager.ReviewManager;
+import manager.SessionManager;
 import manager.TourCatalog;
+import model.Reservation;
 import model.TourPackage;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.time.LocalDate;
+
 import javax.swing.BoxLayout;
 import javax.swing.ScrollPaneConstants;
 
@@ -34,24 +46,27 @@ public class CatalogPage extends AppPage {
     @Override
     public String getPageId(){ return CatalogPage.ID; }
 
+    private static final String[] menuIds = new String[]{"tours", "reserves", "recommends"};
     private Sidebar sideNav;
     private SearchBar searchBar;
-    private AppPanel packageListPanel; // 4. 패키지 배너들을 담을 컨테이너 패널
+    private Map<String, AppScrollPane> packageLists = new HashMap<>(); // 4. 패키지 배너들을 담을 컨테이너 패널
+    private AppPanel listContainer;
+    private CardLayout listLayout;
 
     public void init(){
         // 본인 스타일링 (페이지 전체의 기본 배경색)
         setOpaque(true);
         setBackground(UITheme.PANEL_BACKGROUND_COLOR);
 
-        // --- 1. 사이드바 (기존 코드) ---
+        // --- 1. 사이드바 ---
         sideNav = new Sidebar();
-        sideNav.addMenu("여행 패키지 목록", null);
-        sideNav.addMenu("예약 내역 확인", null);
-        sideNav.addMenu("추천 패키지", null);
+        sideNav.addMenu("여행 패키지 목록", e -> changeList(menuIds[0]));
+        sideNav.addMenu("예약 내역 확인", e -> changeList(menuIds[1]));
+        sideNav.addMenu("추천 패키지", e -> changeList(menuIds[2]));
         sideNav.setLogoutCallback(null);
 
         add(sideNav, BorderLayout.WEST);
-        
+
         // --- 2. 메인 콘텐츠 패널 (신규 코드) ---
         // (CENTER 영역은 SearchBar와 List, 두 개로 나뉘므로 새 패널 필요)
         AppPanel mainContentPanel = new AppPanel(new BorderLayout(0, 45)); // 수직 갭 10px
@@ -68,26 +83,84 @@ public class CatalogPage extends AppPage {
         mainContentPanel.add(searchBar, BorderLayout.NORTH);
 
         // --- 4. 패키지 목록 (mainContentPanel의 CENTER) ---
+        // CardLayout으로 여러 목록을 교체 가능하도록
+        listLayout = new CardLayout();
+        listContainer = new AppPanel(listLayout);
+        listContainer.setBackground(UITheme.TRANSPARENT);
         
-        // 4-1. 배너들을 세로로 쌓을 컨테이너 패널 (JList 대신)
-        packageListPanel = new AppPanel();
-        packageListPanel.setLayout(new BoxLayout(packageListPanel, BoxLayout.Y_AXIS));
-        packageListPanel.setBackground(UITheme.TRANSPARENT); // (요청) 투명 배경
+        // 페이지들 생성 및 추가
+        for(var menu : menuIds){
+            AppScrollPane listPanel = createListPanel();
+            packageLists.put(menu, listPanel);
+            listContainer.add(menu, listPanel);
+        }
+        listLayout.show(listContainer, menuIds[0]);
 
-        // 4-2. 스크롤 기능 추가
-        AppScrollPane scrollPane = new AppScrollPane(packageListPanel);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // 스크롤 속도
-        
-        mainContentPanel.add(scrollPane, BorderLayout.CENTER);
+        mainContentPanel.add(listContainer, BorderLayout.CENTER);
+
+
+        // 좌측 메뉴에 Card 전환 기능 콜백 추가
+
 
         // --- 5. 완성된 메인 패널을 페이지의 CENTER에 추가 ---
         add(mainContentPanel, BorderLayout.CENTER);
 
         applySearchCallbacks();
+        renderNormalBanners(getViewOfList(menuIds[0]));
+        changeList(menuIds[0]);
+    }
 
-        renderBanners(packageListPanel);
+    // 렌더링되는 목록 유형 전환
+    private List<TourBanner> renderedBanners = new ArrayList<>();
+    private AppPanel getViewOfList(String menuId){
+        try {
+            return (AppPanel)packageLists.get(menuId).getViewport().getView();
+        } catch(Exception e){
+            throw new Error("Undefined menu: " + menuId);
+            return null;
+        }
+    }
+    protected void changeList(String id){
+        for(String menuId : menuIds){
+            if(id.equals(menuId)){
+                // 1. 일반 패키지 목록
+                if(id.equals(menuIds[0])){
+                    // 최초 1회만 렌더링
+                    // renderNormalBanners(getViewOfList(id));
+                    listLayout.show(listContainer, id);
+                }
+                // 2. 예약 내역
+                else if(id.equals(menuIds[1])){
+                    // 매번 재렌더링
+                    renderReservations(getViewOfList(id));
+                    listLayout.show(listContainer, id);
+                }
+                // 3. 추천 패키지
+                else if(id.equals(menuIds[2])){
+
+                }
+                // 기타
+                else
+                    throw new Error("Undefined menu: " + id);
+                break;
+            }
+        }
+    }
+
+
+    // TourBanner들 리스트 형태로 넣을 배너
+    private AppScrollPane createListPanel(){
+        var panel = new AppPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(UITheme.TRANSPARENT);
+
+        // 스크롤 기능 추가
+        var scroller = new AppScrollPane(panel); // 래핑
+        scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scroller.getVerticalScrollBar().setUnitIncrement(16);
+
+        return scroller;
     }
 
     /**
@@ -96,7 +169,7 @@ public class CatalogPage extends AppPage {
      */
     private void applySearchCallbacks(){
         searchBar.addSearchListener(e -> {
-            // Todo: 현재 렌더링된 패키지 목록 필터 적용
+            
         });
 
         searchBar.addResetListener(e -> {
@@ -106,10 +179,10 @@ public class CatalogPage extends AppPage {
     }
 
     /**
-     * 데이터 적용 테스트
+     * 1. 일반 목록 렌더링
      * @param panel 적용할 패널
      */
-    private void renderBanners(AppPanel panel){
+    private void renderNormalBanners(AppPanel panel){
         TourCatalog catalog = context.get(TourCatalog.class);
         for(final int id : catalog.getTourIds()){
             TourPackage tour = catalog.getTour(id);
@@ -122,15 +195,86 @@ public class CatalogPage extends AppPage {
             );
 
             banner.addDetailButtonListener(e -> {
-                System.out.println("상세보기 클릭: " + tour.name);
-                // TODO: 상세 페이지로 이동 (ServiceContext.getInstance().navigate(...))
+                // System.out.println("상세보기 클릭: " + tour.name);
+                navigateTo("tourDetail", tour.id);
             });
 
             System.out.println(tour.name);
             panel.add(banner);
         }
     }
+
+    /**
+     * 2. 예약 내역 렌더링
+     * @param panel 적용할 패널
+     */
+    private void renderReservations(AppPanel panel){
+        TourCatalog catalog = context.get(TourCatalog.class);
+        ReservationManager reserves = context.get(ReservationManager.class);
+        SessionManager session = context.get(SessionManager.class);
+        if(!session.isLoggedIn())
+            return;
+
+        
+        LocalDate today = LocalDate.now();
+        for(final int id : reserves.getListByUserId(session.getCurrentUserId().intValue())){
+            TourPackage tour = catalog.getTour(id);
+            Reservation reserve = reserves.getReservation(id);
+            boolean isCompleted = today.isAfter(reserve.start_date.plusDays(tour.day_long));
     
+            ReservationBanner banner = new ReservationBanner(
+                tour.name,
+                tour.place,
+                (tour.day_long-1)+"박 "+tour.day_long+"일",
+                (tour.price/10000)+"만원",
+                RateToStar.stringify((int)Math.round(context.get(ReviewManager.class).getAverageRateOfTour(id))),
+                isCompleted,
+                e -> navigateTo("tourDetail", tour.id),
+                isCompleted
+                    ? (e -> navigateTo("reviewWrite", tour.id))
+                    : (e -> {
+                        reserves.cancel(id);
+                        changeList(menuIds[1]); // 재렌더링 유도
+                    })
+            );
+
+            System.out.println(tour.name);
+            panel.add(banner);
+        }
+    }
+    
+    /**
+     * 3. 추천 목록 렌더링
+     * @param panel 적용할 패널
+     */
+    private void renderRecommendations(AppPanel panel){
+        TourCatalog catalog = context.get(TourCatalog.class);
+        RecommendationManager recommender = context.get(RecommendationManager.class);
+        SessionManager session = context.get(SessionManager.class);
+        if(!session.isLoggedIn())
+            return;
+
+        for(final int id : recommender.){
+            TourPackage tour = catalog.getTour(id);
+            TourBanner banner = new TourBanner(
+                tour.name,
+                tour.place,
+                (tour.day_long-1)+"박 "+tour.day_long+"일",
+                (tour.price/10000)+"만원",
+                RateToStar.stringify((int)Math.round(context.get(ReviewManager.class).getAverageRateOfTour(id)))
+            );
+
+            banner.addDetailButtonListener(e -> {
+                // System.out.println("상세보기 클릭: " + tour.name);
+                navigateTo("tourDetail", tour.id);
+            });
+
+            System.out.println(tour.name);
+            panel.add(banner);
+        }
+    }
+
+
     /**
      * 예시용 TourBanner를 패널에 추가하는 헬퍼 메서드
      * @param panel 배너를 추가할 패널

@@ -36,7 +36,7 @@ public class App {
     public static void main(String[] args) {
         // Swing 앱은 항상 Event Dispatch Thread(EDT)에서 실행해야 합니다.
         SwingUtilities.invokeLater(() -> {
-            
+
             // --- 1. DAO 계층 생성 (메모리 기반 임시 구현체) ---
             UserDAO userDAO = new MemUserDAO();
             TourDAO tourDAO = new MemTourDAO();
