@@ -1,5 +1,5 @@
 package pages;
-//v이따...연결해서 테스트해보고 리뷰 작성 버튼 삭제
+
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -79,7 +79,9 @@ public class PackageDetailPage extends AppPage {
         loadingBar = new AppProgressBar();
         infoPanel.add(loadingBar, BorderLayout.SOUTH);
 
-        centerPanel.add(infoPanel, BorderLayout.NORTH);
+        AppScrollPane infoScroll = new AppScrollPane(infoPanel);
+
+        centerPanel.add(infoScroll, BorderLayout.NORTH);
 
         // --- (2) 리뷰 목록 영역 ---
         AppTitledPanel reviewPanel = new AppTitledPanel("리뷰");
@@ -174,6 +176,7 @@ public class PackageDetailPage extends AppPage {
             descriptionArea.setText("목록에서 투어를 선택해주세요.");
             loadingBar.setVisible(false);
 
+            
             //상세 정보 로드 실패 시 리뷰 오류
             DefaultListModel<String> model = new DefaultListModel<>();
             model.addElement("리뷰를 불러올 수 없습니다. 다시 목록에서 진입해주세요.");
@@ -192,7 +195,7 @@ public class PackageDetailPage extends AppPage {
         runAsyncTask(
             () -> {
                 // [백그라운드 스레드]
-                int id = Math.toIntExact(tourId);   // Long → int 변환 (범위 초과 시 예외)
+                int id = tourId.intValue();
                 TourPackage tour = tourCatalog.getTour(id);
                 
                 if (tour == null) {
@@ -282,7 +285,7 @@ public class PackageDetailPage extends AppPage {
                     // 예약 성공 → 이동 여부 묻는 확인 다이얼로그
                     String[] select = {"예약 목록", "패키지 목록", "추천 목록", "취소"};
                     int choice = JOptionPane.showOptionDialog(this, "예약이 완료되었습니다.", "예약 완료",
-                    0, 0, null, select, select[1]);
+                    0, 0, null, select, select[0]);
 
                     switch (choice) {
                         case 0 :
@@ -360,7 +363,7 @@ public class PackageDetailPage extends AppPage {
                 DefaultListModel<String> model = new DefaultListModel<>();
                 model.addElement("리뷰를 불러오는 중 오류가 발생했습니다: " + error.getMessage());
                 reviewList.setModel(model);
-        }   
+            }   
         );
     }
 

@@ -5,10 +5,13 @@
 package pages;
 //v
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.*;
 import manager.ReviewManager;
 import manager.SessionManager;
 import manager.TourCatalog;
+import model.TourPackage;
 import ui_kit.*;
 
 
@@ -21,9 +24,8 @@ public class ReviewWritePage extends AppPage {
     // 이 페이지가 어떤 패키지에 대한 리뷰인지 식별하는 ID (navigateTo로부터 전달받음)
     private Long targetPackageId;
 
-    private int rating;
-    //1~10으로 내부적 계산... 안될시 일단 1~5
-    //별 클릭 시 값 변경
+    private int rating = 0;
+    private static final int STAR_COUNT = 5; //확정된 별 개수(0~5)
 
     //ui 컴포넌트 영역
     private AppLabel packageLabel; //리뷰를 작성할 패키지 이름
@@ -31,7 +33,7 @@ public class ReviewWritePage extends AppPage {
     private AppTextArea reviewArea; //입력 영역
     private AppButton completeButton; //완료 버튼
     private AppButton cancelButton; //취소 버튼
-    private AppButton[] starButtons; //별.
+    private AppLabel[] stars; //별.
 
 
     public ReviewWritePage(ServiceContext context) {
@@ -62,6 +64,7 @@ public class ReviewWritePage extends AppPage {
         //중간-리뷰 내용들----
         AppTitledPanel reviewPanel = new AppTitledPanel("리뷰 작성");
         reviewPanel.setLayout(new BorderLayout(5,5));
+        this.add(reviewPanel, BorderLayout.CENTER);
 
         //여기서 별점 체크- AppPanel을 div처럼 사용
         AppPanel ratingPanel = new AppPanel(new FlowLayout(FlowLayout.LEFT));
@@ -74,6 +77,8 @@ public class ReviewWritePage extends AppPage {
         reviewPanel.add(reviewArea, BorderLayout.CENTER);
 
         loadingBar = new AppProgressBar();
+        loadingBar.setVisible(false);
+        loadingBar.setIndeterminate(false);
         reviewPanel.add(loadingBar, BorderLayout.SOUTH);
 
         //하단- 작성 완료 버튼/취소 버튼
@@ -111,17 +116,14 @@ public class ReviewWritePage extends AppPage {
         return "reviewWrite";
     }
 
-    /**
-     * 2. (필수) 이 페이지가 화면에 보일 때마다 호출된다.
-     * 여기서는:
-     *  - 패키지 이름을 비동기로 조회해서 상단 라벨에 표시
-     *  - 필요 시 초기 상태(별점, 리뷰 입력 영역) 정리
-     */
-    //onPageShown: 페이지가 표시될 때 호출되며, contextData를 받습니다.
+    //onPageStehown: 페이지가 표시될 때 호출되며, contextData를 받습니다.
     @Override
     public void onPageShown(Object contextData) {
         if (contextData instanceof Long) {
             this.targetPackageId = (Long) contextData;
+            TourPackage tour = tourCatalog.getTour(targetPackageId.intValue());
+            packageLabel.setText(tour.name);
+
         } else {
             this.targetPackageId = null;
             packageLabel.setText("오류: 잘못된 접근입니다. 예약 확인 페이지에서 다시 시도해주세요.");
@@ -129,28 +131,38 @@ public class ReviewWritePage extends AppPage {
         }
     }
 
-    //별 만들기 로직 3개
+    //별점 로직
     private void createRatingStars(JPanel parent) {
-        starButtons = new AppButton[5];
-        for (int i = 0; i < 5; i++) {
-            final int value = i + 1;
-            AppButton star = new AppButton("☆");
+        stars = new AppLabel[STAR_COUNT];
+        rating=0;
 
-            star.addActionListener(e -> setRating(value));  // 이벤트 연결
-
-            starButtons[i] = star;
+        for(int i = 0; i < STAR_COUNT; i++){
+            final int starValue = i + 1;        // 1~5
+            AppLabel star = new AppLabel("☆");
+            star.setFont(star.getFont().deriveFont(24f)); //필요시 크기 조절
+            star.addMouseListener(new MouseAdapter(){
+                public void mouseEntered(MouseEvent e){
+                    paintStars(starValue);
+                    //마우스 올려진 위치의 별까지 채워서 보여줌
+                }
+                public void mouseExited(MouseEvent e){
+                    paintStars(rating);
+                    //마우스를 치우면 기존 rating기준으로 다시 칠해짐
+                }
+                public void mouseClicked(MouseEvent e){
+                    rating = starValue;
+                    paintStars(rating);
+                    //클릭하면 실제 rating 확정
+                }
+            });
+            stars[i] = star;
             parent.add(star);
         }
-        rating = 0;
-        updateStarButtons();
+        paintStars(0);
     }
-    private void setRating(int value) {
-    this.rating = value;
-    updateStarButtons();
-    }
-    private void updateStarButtons() {
-        for (int i = 0; i < 5; i++) {
-            starButtons[i].setText(i < rating ? "★" : "☆");
+    private void paintStars(int count) {
+        for (int i = 0; i < STAR_COUNT; i++) {
+            stars[i].setText(i < count ? "★" : "☆");
         }
     }
 
@@ -242,6 +254,7 @@ public class ReviewWritePage extends AppPage {
 
         JOptionPane.showMessageDialog(this, msg, "리뷰 등록 실패", JOptionPane.ERROR_MESSAGE);
     }
+
     @Override
     public void onPageHidden() {
         // 페이지가 다른 화면으로 전환될 때 최소한으로 정리할 것들
@@ -257,20 +270,9 @@ public class ReviewWritePage extends AppPage {
             completeButton.setEnabled(true);
         }
 
-        // 입력값을 매번 초기화할지 여부는 팀 정책에 따라 다르지만,
-        // 일단 깔끔하게 비워두는 쪽으로 구현해 둔다.
         rating = 0;
-        if (starButtons != null) {
-            updateStarButtons();
-        }
-
         if (reviewArea != null) {
             reviewArea.setText("");
         }
-
-        // targetPackageId는 다음 onPageShown에서 새로 세팅되므로 그대로 둬도 되고,
-        // 완전히 초기화하고 싶으면 아래 한 줄 추가:
-        // targetPackageId = null;
     }
-
 }
