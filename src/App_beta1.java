@@ -63,7 +63,7 @@ public class App_beta1 {
             TourCatalog tourCatalog = new TourCatalog(tourDAO);
             ReservationManager reservationManager = new ReservationManager(reservationDAO, userDAO, tourDAO);
             ReviewManager reviewManager = new ReviewManager(reviewDAO, reservationDAO, userDAO, tourDAO);
-            RecommendationManager recommendationManager = new RecommendationManager(recommendationDAO);
+            RecommendationManager recommendationManager = new RecommendationManager(recommendationDAO, tourCatalog, reservationManager);
             SessionManager sessionManager = new SessionManager();
 
             // --- 3. ServiceContext 생성 및 모든 서비스/매니저 등록 ---

@@ -182,7 +182,7 @@ public class CatalogPage extends AppPage {
                 RecommendationManager recommender = context.get(RecommendationManager.class);
                 var recommendations = recommender.recommend(session.getCurrentUserId().intValue());
                 for(var rec : recommendations){
-                    TourPackage t = catalog.getTour(rec.getId());
+                    TourPackage t = catalog.getTour(rec.getTourId());
                     if(t != null) recommendedPackages.add(t);
                 }
             }
