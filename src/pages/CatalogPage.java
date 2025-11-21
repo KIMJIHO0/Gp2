@@ -62,20 +62,21 @@ public class CatalogPage extends AppPage {
      */
     @Override
     public void onPageShown(Object context){
-        String targetMenuId = menuIds[0]; // 기본값: 일반 목록 (1 또는 null/그 외)
+        // String targetMenuId = menuIds[0]; // 기본값: 일반 목록 (1 또는 null/그 외)
 
-        if(context instanceof Integer){
-            int mode = (Integer) context;
-            if(mode == 2) {
-                targetMenuId = menuIds[1]; // 예약 내역
-            } else if(mode == 3) {
-                targetMenuId = menuIds[2]; // 추천 목록
-            }
-        }
+        // if(context instanceof Integer){
+        //     int mode = (Integer) context;
+        //     if(mode == 2) {
+        //         targetMenuId = menuIds[1]; // 예약 내역
+        //     } else if(mode == 3) {
+        //         targetMenuId = menuIds[2]; // 추천 목록
+        //     }
+        // }
         
         // changeList는 일반 목록에 대해 캐싱된 데이터를 사용하고,
         // 예약/추천 목록은 최신 데이터를 로드하므로 효율성과 데이터 정합성을 모두 보장합니다.
-        changeList(targetMenuId);
+        // changeList(targetMenuId);
+        sideNav.clickMenu((int)context - 1);
     }
 
 

@@ -91,6 +91,14 @@ public class Sidebar extends AppPanel {
     }
 
     /**
+     * 특정 버튼 수동으로 선택하기(클릭 트리거)
+     * @param menuIdx
+     */
+    public void clickMenu(int menuIdx){
+        menuItems.get(menuIdx).doClick();
+    }
+
+    /**
      * 선택 상태로 만들기; 스타일만 변경!
      * @param item 선택할 메뉴
      */
