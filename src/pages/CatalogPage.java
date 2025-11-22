@@ -165,7 +165,7 @@ public class CatalogPage extends AppPage {
                 
                 for(int rId : reservedIds){
                     Reservation r = reserves.getReservation(rId);
-                    if(r != null && r.status != "canceled") {
+                    if(r != null && !r.status.equals("canceled")) {
                         TourPackage t = catalog.getTour(r.tour_id);
                         if(t != null){
                             reservedPackages.add(t);
