@@ -77,7 +77,7 @@ public class App_beta1 {
 
             // --- 4. 임시 세션 추가 (0000 계정) ---
             // UserData.txt의 '0000 admin' 사용
-            sessionManager.login(9124L);
+            sessionManager.login(1245L);
 
             // --- 5. MainFrame 생성 (UI 셸) ---
             MainFrame mainFrame = new MainFrame();

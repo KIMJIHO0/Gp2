@@ -165,7 +165,7 @@ public class CatalogPage extends AppPage {
                 
                 for(int rId : reservedIds){
                     Reservation r = reserves.getReservation(rId);
-                    if(r != null) {
+                    if(r != null && r.status != "canceled") {
                         TourPackage t = catalog.getTour(r.tour_id);
                         if(t != null){
                             reservedPackages.add(t);
@@ -359,7 +359,8 @@ public class CatalogPage extends AppPage {
                 } else {
                     secondaryAction = e -> {
                         reservationManager.cancel(reserve.id);
-                        changeList(menuIds[1]); 
+                        System.out.println(reserve.id + "번 예약 취소됨.");
+                        changeList(menuIds[1]);
                     };
                 }
 
