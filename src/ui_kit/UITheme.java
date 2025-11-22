@@ -122,6 +122,22 @@ public class UITheme {
     public static final Color SCROLLBAR_VIEWPORT_BG = new Color(0,0,0,0);
 
 
+    // LoginPage
+    public static final Border LOGIN_PADDING = BorderFactory.createEmptyBorder(76, 40, 107, 40);
+    public static final Color LOGIN_BG_COLOR = COLOR_BACKGROUND_LIGHT;
+    public static final int LOGIN_INPUT_WIDTH = 307 + (95 - 40); // 로그인 입력 영역 가로크기
+    public static final double LOGIN_TITLE_RATE = 55.0 / 40.0; // 타이틀 배율
+    public static final Dimension LOGIN_INPUT_SIZE = new Dimension(307, 46); // 입력 필드 사이즈
+    public static final Color LOGIN_BTN_FG_COLOR = new Color(88, 159, 186);
+    public static final Font LOGIN_BTN_FONT = new Font("Sagoe UI", Font.PLAIN, 24);
+
+    //// 간격 관련
+    public static final int LOGIN_HGAP = 48; // 사진과 로그인 컴포넌트들 간 간격
+    public static final int LOGIN_TITLE_GAP_BOTTOM = 117; // 제목 - ID 입력칸 사이 갭
+    public static final int LOGIN_INPUT_GAP_BETWEEN = 46; // ID/PW 입력칸 사이 갭
+    public static final int LOGIN_BTN_GAP_TOP = 36;       // login/signup 버튼과 id/pw간 갭
+
+
     // CatalogPage
     public static final Border CATALOG_PANEL_BORDER = BorderFactory.createEmptyBorder(57,30,0,30);
 
@@ -129,7 +145,7 @@ public class UITheme {
     public static final int APPNAME_SIZE = 40; // 기본 글씨 크기(px) 
     public static final Color APPNAME_FG_COLOR = new Color(55, 136, 167); // 글자색
     public static final String APPNAME_TEXT = "OO항공"; // 내용
-    public static final Color APPNAME_BG_COLOR = null; // transparent
+    public static final Color APPNAME_BG_COLOR = TRANSPARENT; // transparent
     public static final String APPNAME_FONT = "SansSerif"; // 폰트. 보통 OS 내장. Times New Roman으로 하려다 한글 깨짐...
 
     // component - Sidebar

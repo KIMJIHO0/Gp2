@@ -27,6 +27,8 @@ import pages.DefaultPage;
 import pages.PackageDetailPage;
 import pages.ReviewWritePage;
 import pages.CatalogPage;
+import pages.LoginPage;
+import pages.MainPage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +79,7 @@ public class App_beta1 {
 
             // --- 4. 임시 세션 추가 (0000 계정) ---
             // UserData.txt의 '0000 admin' 사용
-            sessionManager.login(1245L);
+            // sessionManager.login(1245L);
 
             // --- 5. MainFrame 생성 (UI 셸) ---
             MainFrame mainFrame = new MainFrame();
@@ -87,6 +89,8 @@ public class App_beta1 {
             mainFrame.addPage(new CatalogPage(context));       // id: catalog
             mainFrame.addPage(new PackageDetailPage(context)); // id: tourDetail
             mainFrame.addPage(new ReviewWritePage(context));   // id: reviewWrite
+            mainFrame.addPage(new LoginPage(context));
+            mainFrame.addPage(new MainPage(context));
 
             // --- 7. 애플리케이션 실행 ---
             mainFrame.setTitle("여행 예약 시스템 (Beta 1)");
@@ -95,7 +99,7 @@ public class App_beta1 {
             mainFrame.setLocationRelativeTo(null); // 화면 중앙에 배치
 
             // --- 8. 맨 처음에 CatalogPage를 띄움 ---
-            mainFrame.showPage(CatalogPage.ID, 1); // 1: 패키지 목록
+            mainFrame.showPage(LoginPage.PAGE_ID, null); // 1: 패키지 목록
             mainFrame.setVisible(true);
         });
     }
