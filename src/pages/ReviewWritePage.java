@@ -134,37 +134,53 @@ public class ReviewWritePage extends AppPage {
     //별점 로직
     private void createRatingStars(JPanel parent) {
         stars = new AppLabel[STAR_COUNT];
-        rating=0;
+        rating = 0;
 
-        for(int i = 0; i < STAR_COUNT; i++){
+        for (int i = 0; i < STAR_COUNT; i++) {
             final int starValue = i + 1;        // 1~5
             AppLabel star = new AppLabel("☆");
             star.setFont(star.getFont().deriveFont(24f)); //필요시 크기 조절
-            star.addMouseListener(new MouseAdapter(){
-                public void mouseEntered(MouseEvent e){
+
+            star.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    // hover: 일단 starValue까지 칠하지만, 범위는 0~5로 강제
                     paintStars(starValue);
-                    //마우스 올려진 위치의 별까지 채워서 보여줌
                 }
-                public void mouseExited(MouseEvent e){
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    // 마우스를 치우면 기존 rating 기준으로 다시 칠해짐
                     paintStars(rating);
-                    //마우스를 치우면 기존 rating기준으로 다시 칠해짐
                 }
-                public void mouseClicked(MouseEvent e){
-                    rating = starValue;
+
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    // 클릭하면 rating 확정 (0~5 밖으로는 안 나가게 강제)
+                    setRating(starValue);
                     paintStars(rating);
-                    //클릭하면 실제 rating 확정
                 }
             });
+
             stars[i] = star;
             parent.add(star);
         }
         paintStars(0);
     }
+
     private void paintStars(int count) {
+        if (count < 0) count = 0;
+        if (count > STAR_COUNT) count = STAR_COUNT;
         for (int i = 0; i < STAR_COUNT; i++) {
             stars[i].setText(i < count ? "★" : "☆");
         }
     }
+    private void setRating(int value) {
+        if (value < 0) value = 0;
+        if (value > STAR_COUNT) value = STAR_COUNT; // STAR_COUNT = 5
+        this.rating = value;
+    }
+
 
     //리뷰 작성 완료 버튼 클릭 시 로직
     private void onSubmitReview() {
