@@ -37,9 +37,9 @@ public class UITheme {
 
     // --- AppButton ---
     public static final Font BUTTON_FONT = FONT_BOLD; // 버튼 텍스트 폰트
-    public static final Color BUTTON_BG_COLOR = COLOR_PRIMARY; // 버튼 기본 배경색
-    public static final Color BUTTON_BG_COLOR_HOVER = COLOR_PRIMARY_DARK; // 버튼 마우스 오버 배경색
-    public static final Color BUTTON_FG_COLOR = COLOR_TEXT_ON_PRIMARY; // 버튼 텍스트 색상
+    public static final Color BUTTON_BG_COLOR = Color.WHITE; // 버튼 기본 배경색
+    public static final Color BUTTON_BG_COLOR_HOVER = Color.WHITE; // 버튼 마우스 오버 배경색
+    public static final Color BUTTON_FG_COLOR = Color.BLACK; // 버튼 텍스트 색상
 
     // --- AppLabel ---
     public static final Font LABEL_FONT_NORMAL = FONT_BASE; // 일반 라벨 폰트
@@ -109,6 +109,17 @@ public class UITheme {
     public static final Border TABLE_BORDER = BorderFactory.createLineBorder(COLOR_BORDER); // 테이블 스크롤패널의 테두리
     public static final int TABLE_ROW_HEIGHT = 30; // 테이블 각 행의 높이 (픽셀)
     public static final Insets TABLE_CELL_PADDING = new Insets(5, 8, 5, 8); // 테이블 각 셀의 내부 여백
+
+    // --- AppOptionPane Constants ---
+    // 다이얼로그 배경 및 텍스트
+    public static final Color DIALOG_BG_COLOR = new Color(251, 235, 255); // 배경색
+    public static final Color DAILOG_BORDER_COLOR = new Color(222, 97, 255); // 테두리색
+    public static final Color DIALOG_FG_COLOR = Color.BLACK;    // 글자색
+    public static final Font DIALOG_MSG_FONT = new Font("Malgun Gothic", Font.PLAIN, 16);
+    // 다이얼로그 크기 제약
+    public static final int DIALOG_MAX_WIDTH = 355;
+    public static final int DIALOG_MAX_HEIGHT = 300;
+
 
     // --- AppScrollPane ---
     // 스크롤바 썸(Thumb, 핸들) 색상
