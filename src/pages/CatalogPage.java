@@ -61,7 +61,7 @@ public class CatalogPage extends AppPage {
      * * @param context 1(기본): 목록, 2: 예약 내역, 3: 추천 목록
      */
     @Override
-    public void onPageShown(Object context){
+    public void onPageShown(Object ctx){
         // String targetMenuId = menuIds[0]; // 기본값: 일반 목록 (1 또는 null/그 외)
 
         // if(context instanceof Integer){
@@ -76,7 +76,15 @@ public class CatalogPage extends AppPage {
         // changeList는 일반 목록에 대해 캐싱된 데이터를 사용하고,
         // 예약/추천 목록은 최신 데이터를 로드하므로 효율성과 데이터 정합성을 모두 보장합니다.
         // changeList(targetMenuId);
-        sideNav.clickMenu((int)context - 1);
+
+        // 세션이 없으면 로그인 페이지로 강제 복귀
+        if(!context.get(SessionManager.class).isLoggedIn()){
+            System.out.println("로그인된 사용자가 없어 로그인 페이지로 복귀합니다.");
+            navigateTo(LoginPage.PAGE_ID);
+            return;
+        }
+
+        sideNav.clickMenu((int)ctx - 1);
     }
 
 
@@ -89,7 +97,16 @@ public class CatalogPage extends AppPage {
         sideNav.addMenu("여행 패키지 목록", e -> changeList(menuIds[0]));
         sideNav.addMenu("예약 내역 확인", e -> changeList(menuIds[1]));
         sideNav.addMenu("추천 패키지", e -> changeList(menuIds[2]));
-        sideNav.setLogoutCallback(null); 
+        sideNav.setLogoutCallback(e -> {
+            var sm = context.get(SessionManager.class);
+            if(!sm.isLoggedIn()){
+                System.err.println("로그인도 안 되어있는데 이 페이지를 보여주고 있다고? 뭔가 잘못됐습니다!");
+                return;
+            }
+
+            sm.logout();
+            navigateTo(LoginPage.PAGE_ID);
+        }); 
 
         add(sideNav, BorderLayout.WEST);
 

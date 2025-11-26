@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.BorderFactory;
 
-import manager.SessionManager;
+import manager.*;
 import ui_kit.*;
 import pages.component.AppNameLabel;
 
@@ -49,6 +49,7 @@ public class LoginPage extends AppPage {
         add(east, BorderLayout.EAST);
     }
 
+    AppTextField idField, pwField;
     private void initCenter(AppPanel center){
         // 0. 수직 배치 레이아웃 설정
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
@@ -68,13 +69,13 @@ public class LoginPage extends AppPage {
 
         // 2. ID, PW 입력창
         // 2-1. ID
-        AppTextField idField = new AppTextField();
+        idField = new AppTextField();
         idField.setPlaceholder("ID");
         setupInputStyle(idField);
         center.add(idField);
         center.add(Box.createVerticalStrut(UITheme.LOGIN_INPUT_GAP_BETWEEN)); // 비번 칸과의 갭
         // 2-2. PW
-        AppTextField pwField = new AppTextField();
+        pwField = new AppTextField();
         pwField.setPlaceholder("PASSWORD");
         setupInputStyle(pwField);
         center.add(pwField);
@@ -148,7 +149,33 @@ public class LoginPage extends AppPage {
 
     private void setupLoginCallback(AppButton btn){
         btn.addActionListener(e -> {
+            var sm = context.get(SessionManager.class);
+            var um = context.get(UserManager.class);
 
+            // 0. 이미 로그인 상태인데 현재 페이지일 경우
+            if(sm.isLoggedIn()){
+                System.err.println("Uncaught Error! the user " + sm.getCurrentUserId() + " is logged in.");
+                return;
+            }
+
+            // id는 해싱하여 정수로 변환
+            int id = idField.getText().hashCode();
+            String pw = pwField.getText();
+
+            // 로그인 검사(버튼)
+            // 1-1. 없는 계정일 경우
+            if(!um.exists(id)){
+                AppOptionPane.showMessageDialog(this, "존재하지 않는 계정입니다.");
+            }
+            // 1-2. 비번 틀림
+            else if(!um.checkPassword(id, pw)){
+                AppOptionPane.showMessageDialog(this, "비밀번호가 일치하지 않습니다.");
+            }
+            // 비번 맞아서 로그인 성공
+            else {
+                sm.login((long)id);
+                navigateTo(CatalogPage.ID, 0);
+            }
         });
     }
 

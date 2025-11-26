@@ -79,7 +79,7 @@ public class App_beta1 {
 
             // --- 4. 임시 세션 추가 (0000 계정) ---
             // UserData.txt의 '0000 admin' 사용
-            // sessionManager.login(1245L);
+            sessionManager.login(1245L);
 
             // --- 5. MainFrame 생성 (UI 셸) ---
             MainFrame mainFrame = new MainFrame();
@@ -99,7 +99,7 @@ public class App_beta1 {
             mainFrame.setLocationRelativeTo(null); // 화면 중앙에 배치
 
             // --- 8. 맨 처음에 CatalogPage를 띄움 ---
-            mainFrame.showPage(LoginPage.PAGE_ID, null); // 1: 패키지 목록
+            mainFrame.showPage(CatalogPage.ID, 1); // 1: 패키지 목록
             mainFrame.setVisible(true);
         });
     }
