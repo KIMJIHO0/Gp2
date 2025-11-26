@@ -14,7 +14,7 @@ import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.MouseListener;
 
-public class AppTable extends JScrollPane {
+public class AppTable extends AppScrollPane {
 
     private final JTable table;
 

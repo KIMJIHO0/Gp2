@@ -111,6 +111,17 @@ public class UITheme {
     public static final int TABLE_ROW_HEIGHT = 30; // 테이블 각 행의 높이 (픽셀)
     public static final Insets TABLE_CELL_PADDING = new Insets(5, 8, 5, 8); // 테이블 각 셀의 내부 여백
 
+    // --- AppOptionPane Constants ---
+    // 다이얼로그 배경 및 텍스트
+    public static final Color DIALOG_BG_COLOR = new Color(251, 235, 255); // 배경색
+    public static final Color DAILOG_BORDER_COLOR = new Color(222, 97, 255); // 테두리색
+    public static final Color DIALOG_FG_COLOR = Color.BLACK;    // 글자색
+    public static final Font DIALOG_MSG_FONT = new Font("Malgun Gothic", Font.PLAIN, 16);
+    // 다이얼로그 크기 제약
+    public static final int DIALOG_MAX_WIDTH = 355;
+    public static final int DIALOG_MAX_HEIGHT = 300;
+
+
     // --- AppScrollPane ---
     // 스크롤바 썸(Thumb, 핸들) 색상
     public static final Color SCROLLBAR_THUMB_COLOR = new Color(108, 117, 125);

@@ -10,7 +10,7 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.MouseListener;
 
-public class AppList<E> extends JScrollPane {
+public class AppList<E> extends AppScrollPane {
 
     private final JList<E> list;
 
