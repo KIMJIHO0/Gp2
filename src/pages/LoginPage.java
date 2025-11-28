@@ -29,6 +29,10 @@ public class LoginPage extends AppPage {
     public void onPageShown(Object contextData) {
         if(context.get(SessionManager.class).isLoggedIn())
             navigateTo(MainPage.PAGE_ID);
+
+        // 필드 비우기
+        idField.setText("");
+        pwField.setText("");
     }
 
     private void initComponents(){
@@ -181,7 +185,7 @@ public class LoginPage extends AppPage {
 
     private void setupSignupCallback(AppButton btn){
         btn.addActionListener(e -> {
-            
+            navigateTo(SignupPage.PAGE_ID);
         });
     }
 }

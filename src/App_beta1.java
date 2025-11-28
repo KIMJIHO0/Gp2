@@ -13,22 +13,12 @@ import repository.ReservationRepository;
 import repository.ReviewRepository;
 
 // Manager 임포트
-import manager.RecommendationManager;
-import manager.UserManager;
-import manager.TourCatalog;
-import manager.ReservationManager;
-import manager.ReviewManager;
-import manager.SessionManager;
+import manager.*;
 
 // UI-Kit 및 페이지 임포트
 import ui_kit.MainFrame;
 import ui_kit.ServiceContext;
-import pages.DefaultPage;
-import pages.PackageDetailPage;
-import pages.ReviewWritePage;
-import pages.CatalogPage;
-import pages.LoginPage;
-import pages.MainPage;
+import pages.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,6 +80,7 @@ public class App_beta1 {
             mainFrame.addPage(new PackageDetailPage(context)); // id: tourDetail
             mainFrame.addPage(new ReviewWritePage(context));   // id: reviewWrite
             mainFrame.addPage(new LoginPage(context));
+            mainFrame.addPage(new SignupPage(context));
             mainFrame.addPage(new MainPage(context));
 
             // --- 7. 애플리케이션 실행 ---
