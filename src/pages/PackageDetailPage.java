@@ -10,8 +10,10 @@ import manager.SessionManager;
 import manager.TourCatalog;
 import model.Review;
 import model.TourPackage;
+import pages.component.AppNameLabel;
+import pages.component.ImageSliderPanel;
+import pages.component.InfoRowPanel;
 import ui_kit.*;
-import ui_kit.AppLabel.LabelType;
 
 
 public class PackageDetailPage extends AppPage {
@@ -27,14 +29,28 @@ public class PackageDetailPage extends AppPage {
     // private TourPackage currentTour; // (실제 로드될 데이터)
 
     // 3. UI 컴포넌트 (ui-kit 사용)
-    private AppLabel titleLabel;
-    private AppProgressBar loadingBar;
-    private AppTextArea descriptionArea;
+    private AppNameLabel titleLabel;
+    private AppLabel infoTitle;
+    private AppLabel selectedDateLabel;
+    private AppLabel priceLabel;
+    private AppLabel plusInfoLabel;
     private AppTextField reservationDateField;
     private AppButton reserveButton;
-    private AppButton addReviewButton;
     private AppButton backToListButton;
+    private AppButton dateSelectButton;
+    private AppButton peopleSelectButton;
     private AppList<String> reviewList;
+    private ImageSliderPanel imgSlider;
+    private InfoRowPanel regionRow;
+    private InfoRowPanel periodRow;
+    private InfoRowPanel transportRow;
+    private InfoRowPanel scheduleRow;
+    private InfoRowPanel reservationStatusRow;
+
+    private static final Color U_B_COLOR = UITheme.SEARCH_BAR_BG_COLOR;
+    private int selectedPeopleCount = 1;    // 기본 인원 1명
+    private int basePrice = 0;              // TourPackage에서 가져올 예정
+
 
     /**
      * AppPage의 계약: ServiceContext를 받아 부모에게 넘기고, 필요한 매니저를 가져옵니다.
@@ -57,66 +73,153 @@ public class PackageDetailPage extends AppPage {
      */
     private void initUI() {
         this.setLayout(new BorderLayout(10, 10)); // 페이지 전체 레이아웃
+
+        // --- 상단: 제목+목록으로 나가기 버튼 ---
+        AppPanel titlePanel = new AppPanel(new BorderLayout(10,10)); //titleLabel과 backToListButton을 묶음
+        titlePanel.setPreferredSize(new Dimension(0, 80));
+        titlePanel.setOpaque(true);
+        titlePanel.setBackground(U_B_COLOR);
+        this.add(titlePanel, BorderLayout.NORTH);
+
+        backToListButton = new AppButton("←목록으로", false);
+        titlePanel.add(backToListButton, BorderLayout.WEST);
+        backToListButton.setFont(getFont().deriveFont(Font.BOLD, 16f));
+        backToListButton.setBackground(null);
+        backToListButton.setBorderPainted(false);
+        backToListButton.setOpaque(false);
+
+        titleLabel = new AppNameLabel("투어 정보를 로드 중입니다...");
+        try {
+            titleLabel.scale(0.7);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        titlePanel.add(titleLabel, BorderLayout.CENTER);
+        AppPanel spacePanel = new AppPanel(){
+            @Override
+            public Dimension getPreferredSize() {
+            // 왼쪽 패널과 동일한 크기를 반환 → 좌우 대칭
+            return backToListButton.getPreferredSize();
+            }
+        };
+        spacePanel.setBackground(U_B_COLOR);
+        titlePanel.add(spacePanel, BorderLayout.EAST);
+
+
+        // --- 중앙 전체 컨테이너: 상세 + 리뷰 + 액션 --- <스크롤이 있어야 함
+        AppPanel centerPanel = new AppPanel(new BorderLayout(0,0));
+        AppScrollPane contentPanel = new AppScrollPane(centerPanel);
+        this.add(contentPanel, BorderLayout.CENTER);
+
+        // --- 1. 상세 정보 영역 (중앙 컨테이너의 상단부) ---
+        AppPanel infoPanel = new AppPanel(new BorderLayout());//CENTER, SOUTH만 사용
+        centerPanel.add(infoPanel, BorderLayout.NORTH);
+        AppPanel padPanel_L = new AppPanel();
+        AppPanel padPanel_R = new AppPanel();
+        infoPanel.add(padPanel_L, BorderLayout.WEST);
+        infoPanel.add(padPanel_R, BorderLayout.EAST);
+
+        AppPanel infoContain = new AppPanel(new FlowLayout(FlowLayout.CENTER, 10,10));
+        infoPanel.add(infoContain, BorderLayout.CENTER);
+        infoContain.setBackground(new Color(255,255,255));
+        imgSlider = new ImageSliderPanel(); 
+        imgSlider.setPreferredSize(new Dimension(500, 340)); // 원하는 사이즈로 조정
+        infoContain.add(imgSlider, BorderLayout.WEST); //이미지 추가
+        AppPanel padPanel_C = new AppPanel();
+        infoContain.add(padPanel_C);
+        padPanel_C.setBackground(null);
+        padPanel_C.setPreferredSize(new Dimension(65,80));
         
-        //디자인에 맞게 수정 필요 
-        // --- 상단: 제목 ---
-        titleLabel = new AppLabel("투어 정보를 로드 중입니다...", LabelType.TITLE);
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        this.add(titleLabel, BorderLayout.NORTH);
+        AppPanel infoHeader = new AppPanel(new BorderLayout());//이미지 옆의 내용 추가----
+        infoHeader.setPreferredSize(new Dimension(500, 340));
+        infoContain.add(infoHeader, BorderLayout.EAST);
+        //infoHeader은 NORTH, CENTER, SOUTH만
 
-        // --- 중앙 전체 컨테이너: 상세 + 리뷰 + 액션 ---
-        AppPanel centerPanel = new AppPanel(new BorderLayout(10, 10));
-        this.add(centerPanel, BorderLayout.CENTER);
+        infoTitle = new AppLabel("제목 로드 중...");
+        infoTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        infoHeader.add(infoTitle, BorderLayout.NORTH);
+        JSeparator miniSepBar = new JSeparator(SwingConstants.HORIZONTAL);
+        infoHeader.add(miniSepBar, BorderLayout.CENTER);
+        AppPanel headerContent = new AppPanel();//NORTH CENTER SOUTH
+        infoHeader.add(headerContent, BorderLayout.SOUTH);
+        
+        // TODO: headerContent의 NORTH에 디자인상은 평균평점과 리뷰수.
+        //일시 보류gka
+        AppPanel infoBlock = new AppPanel(new BorderLayout());
+        infoBlock.setLayout(new BoxLayout(infoBlock, BoxLayout.Y_AXIS));
+        headerContent.add(infoBlock, BorderLayout.SOUTH);
+        regionRow = new InfoRowPanel("지역: ", "로딩중...");
+        periodRow = new InfoRowPanel("기간: ", "로딩중...");
+        transportRow = new InfoRowPanel("이동수단: ", "로딩중...");
+        infoBlock.add(regionRow);
+        infoBlock.add(periodRow);
+        infoBlock.add(transportRow);
 
-        // --- (1) 상세 정보 영역 ---
-        AppTitledPanel infoPanel = new AppTitledPanel("상세 정보");
-        infoPanel.setLayout(new BorderLayout(5, 5));
+        AppPanel breifInfo = new AppPanel(new BorderLayout()); //north south는 bar자리
+        infoPanel.add(breifInfo, BorderLayout.SOUTH);
+        JSeparator subSepBar_U = new JSeparator(SwingConstants.HORIZONTAL);
+        breifInfo.add(subSepBar_U, BorderLayout.NORTH);
+        JSeparator subSepBar_B = new JSeparator(SwingConstants.HORIZONTAL);
+        breifInfo.add(subSepBar_B, BorderLayout.SOUTH);
+        AppPanel breifInfoBlock = new AppPanel();
+        breifInfoBlock.setLayout(new BoxLayout(breifInfoBlock, BoxLayout.Y_AXIS));
+        breifInfo.add(breifInfoBlock, BorderLayout.WEST);
+        scheduleRow = new InfoRowPanel("일정", "로딩중...");
+        reservationStatusRow = new InfoRowPanel("예약현황", "로딩중...");
+        breifInfoBlock.add(scheduleRow);
+        breifInfoBlock.add(reservationStatusRow);
 
-        descriptionArea = new AppTextArea();
-        descriptionArea.setEditable(false);
-        infoPanel.add(descriptionArea, BorderLayout.CENTER);
+        // --- 2. 추가 상세 정보 영역(필요시 작성, 현재는 더미 페이지만.) ---
+        AppPanel plusInfoPanel = new AppPanel(new BorderLayout());
+        centerPanel.add(plusInfoPanel, BorderLayout.CENTER);
+        plusInfoLabel = new AppLabel("여기에 내용을 넣을 수 있습니다.");
+        plusInfoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        plusInfoPanel.add(plusInfoLabel, BorderLayout.NORTH);
 
-        loadingBar = new AppProgressBar();
-        infoPanel.add(loadingBar, BorderLayout.SOUTH);
-
-        AppScrollPane infoScroll = new AppScrollPane(infoPanel);
-
-        centerPanel.add(infoScroll, BorderLayout.NORTH);
-
-        // --- (2) 리뷰 목록 영역 ---
+        // --- 3. 리뷰 영역, 일단은 기존 상태 그대로 붙임. ---
         AppTitledPanel reviewPanel = new AppTitledPanel("리뷰");
         reviewPanel.setLayout(new BorderLayout(5, 5));
-
+        centerPanel.add(reviewPanel, BorderLayout.SOUTH);
         reviewList = new AppList<>();
         reviewPanel.add(reviewList, BorderLayout.CENTER);
 
-        centerPanel.add(reviewPanel, BorderLayout.CENTER);
 
-        // --- (3) 하단: 예약 및 기타 액션 ---
-        AppTitledPanel actionPanel = new AppTitledPanel("예약 및 기타");
-        actionPanel.setLayout(new BorderLayout(5, 5));
+        // --- 하단: 예약 및 기타 액션 ---
+        AppPanel actionPanel = new AppPanel(new BorderLayout(10,10)); //하단 컴포넌트를 묶음
+        actionPanel.setPreferredSize(new Dimension(0, 80));
+        actionPanel.setOpaque(true);
+        actionPanel.setBackground(U_B_COLOR);
+        this.add(actionPanel, BorderLayout.SOUTH);
 
-        AppPanel reservationForm = new AppPanel(new FlowLayout(FlowLayout.LEFT));
-        reservationForm.add(new AppLabel("희망 날짜:"));
+        AppPanel actionRowPanel = new AppPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        actionRowPanel.setBackground(U_B_COLOR);
+        // 숨겨진 날짜 저장용 텍스트 필드 (UI에는 붙이지 않음/handleReservation()에서 수정 없이 사용)
         reservationDateField = new AppTextField(12);
+        // 1) 날짜 선택 버튼 + 선택된 날짜 라벨
+        dateSelectButton = new AppButton("날짜 선택");
+        selectedDateLabel = new AppLabel("날짜 미선택", AppLabel.LabelType.SMALL);
+
+        // 2) 인원 선택 버튼 + 금액 라벨 (이벤트는 다음 단계에서)
+        peopleSelectButton = new AppButton("인원 선택");
+        priceLabel = new AppLabel("0", AppLabel.LabelType.SMALL);
+        AppLabel wonLabel = new AppLabel("만원", AppLabel.LabelType.SMALL);
+
+        // 3) 예약하기 버튼
         reserveButton = new AppButton("예약하기");
-        reservationForm.add(reservationDateField);
-        reservationForm.add(reserveButton);
-        actionPanel.add(reservationForm, BorderLayout.NORTH);
 
-        AppPanel otherButtons = new AppPanel(new FlowLayout(FlowLayout.RIGHT));
-        addReviewButton = new AppButton("리뷰 작성");
-        backToListButton = new AppButton("목록으로");
-        otherButtons.add(addReviewButton);
-        otherButtons.add(backToListButton);
-        actionPanel.add(otherButtons, BorderLayout.SOUTH);
+        // 한 줄에 순서대로 배치
+        actionRowPanel.add(dateSelectButton);
+        actionRowPanel.add(selectedDateLabel);
+        actionRowPanel.add(peopleSelectButton);
+        actionRowPanel.add(priceLabel);
+        actionRowPanel.add(wonLabel);
+        actionRowPanel.add(reserveButton);
 
-        centerPanel.add(actionPanel, BorderLayout.SOUTH);
+        // 하단 패널에 붙이기
+        actionPanel.add(actionRowPanel, BorderLayout.EAST);
     }
 
-    /**
-     * UI 컴포넌트의 이벤트 리스너를 설정합니다.
-     */
     private void initListeners() {
         // "목록으로" 버튼 클릭 -> "tourList" 페이지로 데이터 없이 이동
         backToListButton.addActionListener(e -> {
@@ -127,16 +230,72 @@ public class PackageDetailPage extends AppPage {
         reserveButton.addActionListener(e -> {
             handleReservation();
         });
-        
-        // "리뷰 작성" 버튼 클릭 -> 전역 이벤트 발행
-        addReviewButton.addActionListener(e -> {
-            // 2. publishEvent (현재 투어 ID를 이벤트 객체에 담아 발행)
-            // (ReviewAddedEvent 클래스가 events/ 패키지에 정의되어 있다고 가정)
-            // publishEvent(new ReviewAddedEvent(this.currentTourId));
-            
-            //JOptionPane.showMessageDialog(this, "리뷰 작성 이벤트가 발행되었습니다. (구독한 페이지가 반응합니다)");
-            navigateTo("reviewWrite", currentTourId);
 
+        // "날짜 선택" 버튼 클릭 -> 날짜 입력받기
+        dateSelectButton.addActionListener(e -> {
+            String input = JOptionPane.showInputDialog(
+                this,
+                "희망 날짜를 입력해주세요 (예: 2025-11-18)",
+                "날짜 선택",
+                JOptionPane.PLAIN_MESSAGE
+            );
+
+            // 취소하거나 빈 입력이면 무시
+            if (input == null || input.isBlank()) {
+                return;
+            }
+
+            input = input.trim();
+
+            try {
+                // 형식 검증 (yyyy-MM-dd)
+                LocalDate parsed = LocalDate.parse(input);
+
+                // 라벨에 표시
+                selectedDateLabel.setText(parsed.toString());
+
+                // 예약 로직에서 쓰기 위해 내부 필드에도 세팅
+                reservationDateField.setText(parsed.toString());
+
+            } catch (DateTimeParseException ex) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "날짜 형식이 올바르지 않습니다.\n예: 2025-11-18",
+                    "오류",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
+
+        // "인원 선택" 버튼 클릭 -> 인원 입력 + 금액 재계산
+        peopleSelectButton.addActionListener(e -> {
+            String input = JOptionPane.showInputDialog(this,"인원 수를 입력해주세요 (예: 1, 2, 3...)",
+                "인원 선택",JOptionPane.PLAIN_MESSAGE);
+
+            // 취소 또는 공백이면 무시
+            if (input == null || input.isBlank()) return;
+
+            input = input.trim();
+
+            try {
+                int people = Integer.parseInt(input);
+
+                if (people <= 0) {
+                    JOptionPane.showMessageDialog(this,"인원 수는 1명 이상이어야 합니다.",
+                    "오류",JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // TODO: 필요하면 최대 인원 제한도 여기서 체크
+                selectedPeopleCount = people;
+
+                // 금액 라벨 갱신
+                updatePriceLabel();
+
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "인원 수는 숫자로 입력해주세요.",
+                "오류",JOptionPane.ERROR_MESSAGE);
+            }
         });
     }
     
@@ -158,23 +317,18 @@ public class PackageDetailPage extends AppPage {
         return "tourDetail"; // 이 페이지의 고유 ID
     }
 
-    /**
-     * 4. onPageShown: 페이지가 표시될 때 호출되며, contextData를 받습니다.
-     */
     @Override
     public void onPageShown(Object contextData) {
         // "tourList" 페이지에서 넘겨준 투어 ID를 받습니다.
         if (contextData instanceof Long) {
             this.currentTourId = (Long) contextData;
-            
             //상세 정보 선 로드
             loadTourDetails(this.currentTourId);
         
         } else {
             // ID가 없거나 잘못된 경우
             titleLabel.setText("오류: 잘못된 접근입니다.");
-            descriptionArea.setText("목록에서 투어를 선택해주세요.");
-            loadingBar.setVisible(false);
+            plusInfoLabel.setText("목록에서 투어를 선택해주세요.");
 
             
             //상세 정보 로드 실패 시 리뷰 오류
@@ -189,9 +343,6 @@ public class PackageDetailPage extends AppPage {
      * (Helper) tourId를 사용해 상세 정보를 로드합니다.
      */
     private void loadTourDetails(Long tourId) {
-        loadingBar.setIndeterminate(true); // 로딩 바 시작
-        loadingBar.setVisible(true);
-
         runAsyncTask(
             () -> {
                 // [백그라운드 스레드]
@@ -205,7 +356,31 @@ public class PackageDetailPage extends AppPage {
             },
             (tour) -> {
                 titleLabel.setText(tour.name);
+                infoTitle.setText(tour.name);
 
+                imgSlider.setSlids(java.util.List.of(
+                    "슬라이드 1: 더미",
+                    "슬라이드 2: 더미",
+                    "슬라이드 3: 더미"
+                ));
+                // 상단 infoBlock 값 채우기
+                if (regionRow != null) {
+                    regionRow.setValue(tour.place); // 지역
+                }
+                if (periodRow != null) {
+                    periodRow.setValue(tour.day_long + "일"); // 기간
+                }
+                
+                // TODO : 이동수단 임시값
+                if (transportRow != null) {
+                    //transportRow.setValue(tour.transport != null ? tour.transport : "-");
+                    transportRow.setValue("버스");
+                }
+                // TODO : breifInfoBlock 값 채우기 (일정/예약현황은 일단 임시 값)
+                if (scheduleRow != null) scheduleRow.setValue("총 " + tour.day_long + "일 일정");
+                // TODO : 실제 예약 현황 로직 생기면 교체
+                if (reservationStatusRow != null) reservationStatusRow.setValue("예약 가능");
+                    
                 // 상세 정보 문자열 구성
                 StringBuilder sb = new StringBuilder();
                 sb.append("지역: ").append(tour.place).append("\n");
@@ -216,19 +391,26 @@ public class PackageDetailPage extends AppPage {
                     sb.append("- ").append(s).append("\n");
                 }
 
-                descriptionArea.setText(sb.toString());
-                
-                loadingBar.setIndeterminate(false);
-                loadingBar.setVisible(false);
+                plusInfoLabel.setText(toHtml(sb.toString()));
+
+                // === 여기서부터 하단 예약 바 초기화 ===
+
+                // TODO: TourPackage 안의 실제 가격 필드에 맞게 수정할 것.
+                // 예시: tour.pricePerPerson, tour.price, tour.basePrice 등
+                // 지금은 tour.price 라고 가정:
+                this.basePrice = tour.price;   // <-- 실제 필드명에 맞게 바꿔라
+                this.selectedPeopleCount = 1; // 기본 인원 1명으로 초기화
+                updatePriceLabel(); // 금액 라벨 갱신
+
+                // 날짜/라벨 초기화 (선택)
+                if (selectedDateLabel != null) selectedDateLabel.setText("날짜 미선택");
 
                 loadReviewsForCurrentTour(tourId);
             },
             (error) -> {
                 // [EDT - 실패]
                 titleLabel.setText("투어 정보 로드 실패");
-                descriptionArea.setText(error.getMessage());
-                loadingBar.setIndeterminate(false);
-                loadingBar.setVisible(false);
+                plusInfoLabel.setText(error.getMessage());
 
                 // ✅ 리뷰 영역도 “상세 실패 때문에 안 보여줌” 식으로 한 번만 정리
                 DefaultListModel<String> model = new DefaultListModel<>();
@@ -316,6 +498,22 @@ public class PackageDetailPage extends AppPage {
         );
     }
 
+    // 하단 금액 라벨을 현재 basePrice × selectedPeopleCount 값으로 갱신
+    private void updatePriceLabel() {
+        if (priceLabel == null) return;  // 아직 UI 초기화 전일 수 있으니 방어
+        int total = basePrice * selectedPeopleCount;
+        priceLabel.setText(String.valueOf(total));
+    }
+
+    private String toHtml(String multiLineText) {
+        if (multiLineText == null) return "<html></html>";
+        String escaped = multiLineText
+            .replace("\n", "<br>")
+            .replace(" ", "&nbsp;"); // 선택 (들여쓰기 유지)
+        return "<html>" + escaped + "</html>";
+    }
+
+
     private void loadReviewsForCurrentTour(Long tourId) {
         if (tourId == null) {
             // 잘못된 접근이면 리스트에 안내만 띄움
@@ -366,5 +564,4 @@ public class PackageDetailPage extends AppPage {
             }   
         );
     }
-
 }
