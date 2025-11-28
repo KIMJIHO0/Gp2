@@ -47,4 +47,4 @@
 47 프라하감성여행 프라하 2200000 4 35000 2 비행기 지하철 2 10 SPECIFIC 2 2024-09-01 2024-09-18 +420-2-0027 res/img/47/thumbnail.png 3 res/img/47/shot_001.png res/img/47/shot_002.png res/img/47/shot_003.png 구시가지 카를교 프라하성 야경투어
 48 빈클래식여행 빈 2300000 5 38000 2 비행기 지하철 2 10 WEEKDAY +43-1-0028 res/img/48/thumbnail.png 3 res/img/48/shot_001.png res/img/48/shot_002.png res/img/48/shot_003.png 쉔부른 시청사 오페라하우스 벨베데레 카페문화
 49 뉴욕시티투어 뉴욕 3500000 5 50000 2 비행기 지하철 2 12 SPECIFIC 3 2024-11-23 2024-12-24 2024-12-31 +1-212-0029 res/img/49/thumbnail.png 3 res/img/49/shot_001.png res/img/49/shot_002.png res/img/49/shot_003.png 타임스퀘어 센트럴파크 자유의여신상 브루클린 메트로폴리탄
-50 밴쿠버자연투어 밴쿠버 3300000 5 42000 2 비행기 차량 2 10 NONE +1-604-0030 res/img/50/thumbnail.png 3 res/img/50/shot_001.png res/img/50/shot_002.png res/img/50/shot_003.png 스탠리파크 그라우스마운틴 개스타운 씨월드 야경
+50 밴쿠버자연투어 밴쿠버 2300000 5 42000 2 비행기 차량 2 10 NONE +1-604-0030 res/img/50/thumbnail.png 3 res/img/50/shot_001.png res/img/50/shot_002.png res/img/50/shot_003.png 스탠리파크 그라우스마운틴 개스타운 씨월드 야경
