@@ -21,7 +21,6 @@ import manager.SessionManager;
 // 3. UI-Kit 및 페이지 임포트
 import ui_kit.MainFrame;
 import ui_kit.ServiceContext;
-import ui_kit.AppPage;
 import pages.DefaultPage;
 // (실제 운영 시) import pages.LoginPage;
 // (실제 운영 시) import pages.HomePage;

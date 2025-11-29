@@ -1,24 +1,29 @@
 package repository;
 
-import model.User;
-
+import model.User2;
+import model.User2.Sex;
 import java.util.Scanner;
 
 public class UserItem implements Manageable{
   private int id;
   private String password;
+  String name;
+  int age;
+  Sex sex;
 
 
   @Override
   public void read(Scanner scan) {
-    //1245 pw7592
     this.id=scan.nextInt();
     this.password=scan.next();
+    this.name=scan.next();
+    this.age=scan.nextInt();
+    this.sex=Sex.valueOf(scan.next());
   }
 
   @Override
   public void print() {
-    System.out.printf("UserItem{id=%d, password=%s}\n", id, password);
+    System.out.print(toUser());
   }
 
   @Override
@@ -27,9 +32,7 @@ public class UserItem implements Manageable{
   }
 
   public int getId() {return id;}
-  public String getPassword() {return password;}
-
-  public User toUser() {
-    return new User(id, password);
+  public User2 toUser() {
+    return new User2(id, password, name, age, sex);
   }
 }
