@@ -179,7 +179,7 @@ public class UITheme {
 
     // --- component - SearchBar ---
     public static final Color SEARCH_BAR_BG_COLOR = new Color(185, 212, 224); // 이미지의 하늘색 배경
-    public static final int SEARCH_BAR_HEIGHT = 55; // 검색바 패널의 고정 높이
+    public static final int SEARCH_BAR_HEIGHT = 27; // 검색바 패널의 고정 높이
     public static final Border SEARCH_BAR_PADDING = BorderFactory.createEmptyBorder(9, 16, 10, 16);
     public static final Dimension SEARCH_BAR_COMBO_SIZE = new Dimension(80, 27); // 콤보박스 크기
     public static final Color SEARCH_BAR_TEXT_FIELD_BG = Color.WHITE; // 검색창 배경색

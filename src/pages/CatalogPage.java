@@ -3,6 +3,7 @@ package pages;
 import ui_kit.*;
 import util.RateToStar;
 import pages.component.Sidebar;
+import pages.component.DetailedSearchBar;
 import pages.component.ReservationBanner;
 import pages.component.SearchBar;
 import pages.component.TourBanner;
@@ -35,7 +36,7 @@ public class CatalogPage extends AppPage {
     // --- 필드 정의 ---
     private static final String[] menuIds = new String[]{"tours", "reserves", "recommends"};
     private Sidebar sideNav;
-    private SearchBar searchBar;
+    private DetailedSearchBar searchBar;
     
     private Map<String, AppScrollPane> packageLists = new HashMap<>(); 
     private AppPanel listContainer;
@@ -119,8 +120,10 @@ public class CatalogPage extends AppPage {
 
 
         // --- 3. 검색창 ---
-        searchBar = new SearchBar();
+        searchBar = new DetailedSearchBar();
         mainContentPanel.add(searchBar, BorderLayout.NORTH);
+        // var searchBar2 = new DetailedSearchBar();
+        // mainContentPanel.add(searchBar2, BorderLayout.NORTH);
 
         // --- 4. 패키지 목록 컨테이너 ---
         listLayout = new CardLayout();
@@ -154,7 +157,7 @@ public class CatalogPage extends AppPage {
         this.activeMenuId = id; 
         
         // 탭 전환 시 필터 초기화
-        searchBar.clearFilters();
+        // searchBar.clearFilters();
         // 기본값 재설정 (데이터 로드 전 임시)
         searchBar.setRegions(new String[]{"지역"});
         searchBar.setPrices(new String[]{"가격"});
@@ -253,11 +256,11 @@ public class CatalogPage extends AppPage {
 
 
     private void applySearchCallbacks(){
+        // 실제 필터링은 필터값을 이용하여 reRender 측에서 수행.
+        // 1. 검색 필터 적용
         searchBar.addSearchListener(e -> reRenderBanners(activeMenuId));
-        searchBar.addResetListener(e -> {
-            searchBar.clearFilters();
-            reRenderBanners(activeMenuId);
-        });
+        // 2. 상세 필터 적용
+        searchBar.addApplyFilterListener(_ -> reRenderBanners(activeMenuId));
     }
 
     /**
@@ -309,8 +312,11 @@ public class CatalogPage extends AppPage {
         }
         searchBar.setPrices(prices.toArray(new String[0]));
 
-        // [Fix] 콤보박스 변경 시 즉시 필터링 적용 (필터 미동작 해결)
-        searchBar.addFilterListener(e -> reRenderBanners(activeMenuId));
+        // Todo - TourPackage2에 따른 추가 필터들
+        // 3. 인원수
+        // searchBar.setPeoples(items);
+        // 4. 교통수단
+        // searchBar.setTransports(items);
     }
 
 
@@ -320,13 +326,15 @@ public class CatalogPage extends AppPage {
         
         List<TourPackage> sourceData = cachedTourData.getOrDefault(menuId, new ArrayList<>());
         
-        // [Fix] 검색어 앞뒤 공백 제거 (검색 오류 방지)
+        // 검색어 앞뒤 공백 제거 (검색 오류 방지)
         String keyword = searchBar.getSearchText().trim().toLowerCase();
         
-        // [Fix] null 체크 추가 (NPE 방지)
+        // null 체크 추가 (NPE 방지)
+        // 1. 지역 필터링
         String regionFilter = searchBar.getSelectedRegion();
         if(regionFilter == null) regionFilter = "지역";
 
+        // 2. 가격 필터링
         String priceFilter = searchBar.getSelectedPriceRange();
         if(priceFilter == null) priceFilter = "가격";
         
@@ -341,6 +349,11 @@ public class CatalogPage extends AppPage {
                 filtered.add(tour);
         }
 
+        // 3. 인원수 필터링
+        // filtered...
+        // 4. 교통수단 필터링
+        // filtered...
+
         renderBanners(targetPanel, filtered, menuId);
 
         targetPanel.revalidate();
@@ -353,7 +366,6 @@ public class CatalogPage extends AppPage {
         ReservationManager reservationManager = context.get(ReservationManager.class);
 
         if (data.isEmpty()) {
-            // [Fix] AppLabel 생성자 오류 수정 (폰트는 setter로 설정)
             AppLabel emptyLabel = new AppLabel("표시할 항목이 없습니다.");
             panel.add(emptyLabel);
             return;
@@ -388,7 +400,7 @@ public class CatalogPage extends AppPage {
                     isCompleted, detailAction, secondaryAction
                 );
                 panel.add(banner);
-            } 
+            }
             else {
                 TourBanner banner = new TourBanner(
                     tour.name, tour.place, duration, priceStr, rating
