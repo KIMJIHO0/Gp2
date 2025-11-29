@@ -1,66 +1,93 @@
 package manager;
 
 import dao.RecommendationDAO;
+import dao.UserDAO2;
 import model.Recommendation;
-import model.TourPackage;
+import model.TourPackage2;
+import model.User2;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class RecommendationManager {
 
-    private final RecommendationDAO dao;
-    private final TourCatalog catalog;
-    private final ReservationManager reservationManager;
+    private final RecommendationDAO recommendationDAO;
+    private final UserDAO2 userDAO2;
 
-    public RecommendationManager(RecommendationDAO dao, TourCatalog catalog, ReservationManager reservationManager) {
-        this.dao = dao;
-        this.catalog = catalog;
-        this.reservationManager = reservationManager;
+    public RecommendationManager(RecommendationDAO dao, UserDAO2 userDAO2) {
+        this.recommendationDAO = dao;
+        this.userDAO2 = userDAO2;
     }
 
-    /**
-     * userId 기반 추천
-     * - 최근 예약한 상품 가격대와 비슷한 여행 추천
-     */
     public List<Recommendation> recommend(int userId) {
 
-        // 1. 사용자의 예약 목록
-        var myList = reservationManager.getListByUserId(userId);
+        User2 user = userDAO2.getUser(userId).orElse(null);
+        if (user == null) return List.of();
 
-        if (myList.isEmpty()) {
-            // 예약이 없으면 기본 추천 반환
-            return dao.getRecommendations();
-        }
+        Map<Integer, Recommendation> resultMap = new LinkedHashMap<>();
 
-        // 2. 최근 예약한 여행 상품 ID
-        int lastTourId = myList.get(myList.size() - 1);
+        /* ===================================================
+         * 1) 연령/성별 기반 추천
+         * =================================================== */
+        List<Integer> demoIds =
+                recommendationDAO.getDemographicRecommendedTourIds(user);
 
-        // 3. 해당 상품 정보 조회
-        TourPackage lastTour = catalog.getTour(lastTourId);
-        if (lastTour == null) {
-            return dao.getRecommendations();
-        }
-
-        int lastPrice = lastTour.price;
-        int minPrice = lastPrice - 50000;  // -5만원
-        int maxPrice = lastPrice + 50000;  // +5만원
-
-        List<Recommendation> result = new ArrayList<>();
-
-        // catalog.getAllTours() 없음 → getTourIds() 순회로 대체
-        for (int id : catalog.getTourIds()) {
-            TourPackage t = catalog.getTour(id);
-            if (t == null) continue;
-
-            if (t.price >= minPrice && t.price <= maxPrice) {
-                result.add(new Recommendation(
-                        t.id,
-                        "최근 예약(" + lastPrice + "원)과 비슷한 가격대 추천"
-                ));
+        for (int id : demoIds) {
+            TourPackage2 t = recommendationDAO.getTourById(id);
+            if (t != null) {
+                String msg = String.format("연령(%d)/성별(%s) 기반 추천", user.age, user.sex);
+                resultMap.put(id, new Recommendation(id, msg));
             }
         }
 
-        return result;
+        /* ===================================================
+         * 2) 예약 기반 추천
+         * =================================================== */
+        List<TourPackage2> used = recommendationDAO.getUsedTourPackages(userId);
+        if (!used.isEmpty()) {
+
+            // 1) 선호 지역
+            String favPlace = used.stream()
+                    .collect(Collectors.groupingBy(t -> t.place, Collectors.counting()))
+                    .entrySet().stream()
+                    .max(Map.Entry.comparingByValue())
+                    .map(Map.Entry::getKey)
+                    .orElse(null);
+
+            // 2) 선호 가격대 (평균 ± 50,000)
+            double avgPrice = used.stream()
+                    .mapToInt(t -> t.price)
+                    .average()
+                    .orElse(0);
+
+            int minPrice = (int) avgPrice - 50_000;
+            int maxPrice = (int) avgPrice + 50_000;
+
+            // 3) 선호 교통수단
+            String favTransport = used.stream()
+                    .flatMap(t -> Arrays.stream(t.transport))
+                    .collect(Collectors.groupingBy(s -> s, Collectors.counting()))
+                    .entrySet().stream()
+                    .max(Map.Entry.comparingByValue())
+                    .map(Map.Entry::getKey)
+                    .orElse(null);
+
+            // 모든 투어에서 조건에 맞는 것 추천
+            for (TourPackage2 t : used.get(0).catalog.getAllTours()) {
+                boolean okPlace = t.place.equals(favPlace);
+                boolean okPrice = t.price >= minPrice && t.price <= maxPrice;
+                boolean okTransport = Arrays.asList(t.transport).contains(favTransport);
+
+                if (okPlace && okPrice && okTransport) {
+                    if (!resultMap.containsKey(t.id)) {
+                        resultMap.put(t.id,
+                                new Recommendation(t.id,
+                                        "이전 예약 패턴 기반 추천"));
+                    }
+                }
+            }
+        }
+
+        return new ArrayList<>(resultMap.values());
     }
 }
