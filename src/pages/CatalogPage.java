@@ -16,6 +16,7 @@ import model.TourPackage2;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -313,9 +314,24 @@ public class CatalogPage extends AppPage {
 
         // Todo - TourPackage22에 따른 추가 필터들
         // 3. 인원수
-        // searchBar.setPeoples(items);
+        searchBar.setPeoples(new String[]{
+            "인원",
+            "1인",
+            "2인",
+            "3~4인",
+            "5~8인",
+            "9~10인",
+            "11인 이상"
+        });
+
         // 4. 교통수단
-        // searchBar.setTransports(items);
+        Set<String> transportsSet = new HashSet<>();
+        for(TourPackage2 t : data)
+            for(String transport : t.transport)
+                transportsSet.add(transport);
+        List<String> transports = new ArrayList<>(transportsSet);
+        transports.add(0, "교통수단");
+        searchBar.setTransports(transports.toArray(new String[0]));
     }
 
 
@@ -336,22 +352,53 @@ public class CatalogPage extends AppPage {
         // 2. 가격 필터링
         String priceFilter = searchBar.getSelectedPriceRange();
         if(priceFilter == null) priceFilter = "가격";
+
+        // 3. 인원 필터링
+        String raw_headFilter = searchBar.getSelectedPeople();
+        int[] head_range = new int[2];
+        switch(raw_headFilter){
+            case "1인":
+                head_range[0] = head_range[1] = 1;
+                break;
+            case "2인":
+                head_range[0] = head_range[1] = 2;
+                break;
+            case "3~4인":
+                head_range[0] = 3;
+                head_range[1] = 4;
+                break;
+            case "5~8인":
+                head_range[0] = 5;
+                head_range[1] = 8;
+                break;
+            case "9~10인":
+                head_range[0] = 9;
+                head_range[1] = 10;
+                break;
+            case "11인 이상":
+                head_range[0] = 11;
+                head_range[1] = Integer.MAX_VALUE;
+                break;
+            default:
+                head_range[0] = -1; // flag
+        }
         
+        // 4. 교통수단 필터링
+        String transportFilter = searchBar.getSelectedTransport();
+
         List<TourPackage2> filtered = new ArrayList<>();
         
         for(TourPackage2 tour : sourceData){
             boolean matchKeyword = keyword.isEmpty() || tour.name.toLowerCase().contains(keyword);
             boolean matchRegion = regionFilter.equals("지역") || tour.place.equals(regionFilter);
             boolean matchPrice = priceFilter.equals("가격") || isPriceInRange(tour.price, priceFilter);
+            boolean matchHeads = head_range[0]<0? true: (tour.headcount_range[0] <= head_range[0]) && (head_range[1] <= tour.headcount_range[1]);
+            boolean matchTransport = transportFilter.equals("교통수단")? true: Arrays.stream(tour.transport)
+                                        .anyMatch(e -> e.equals(transportFilter));
 
-            if(matchKeyword && matchRegion && matchPrice)
+            if(matchKeyword && matchRegion && matchPrice && matchHeads && matchTransport)
                 filtered.add(tour);
         }
-
-        // 3. 인원수 필터링
-        // filtered...
-        // 4. 교통수단 필터링
-        // filtered...
 
         renderBanners(targetPanel, filtered, menuId);
 
