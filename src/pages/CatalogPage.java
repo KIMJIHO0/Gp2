@@ -5,7 +5,6 @@ import util.RateToStar;
 import pages.component.Sidebar;
 import pages.component.DetailedSearchBar;
 import pages.component.ReservationBanner;
-import pages.component.SearchBar;
 import pages.component.TourBanner;
 import manager.RecommendationManager;
 import manager.ReservationManager2;

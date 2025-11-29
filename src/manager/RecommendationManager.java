@@ -2,7 +2,6 @@ package manager;
 
 import dao.RecommendationDAO;
 import model.Recommendation;
-import model.TourPackage2;
 
 import java.util.List;
 import java.util.ArrayList;

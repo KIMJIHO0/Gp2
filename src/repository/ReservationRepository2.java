@@ -1,6 +1,7 @@
 package repository;
 
 import dao.ReservationDAO2;
+import model.Reservation;
 import model.Reservation2;
 
 import java.util.ArrayList;
@@ -59,4 +60,14 @@ public class ReservationRepository2 implements ReservationDAO2 {
     return list;
   }
 
+  // UserDAO 1버전 임시 구현(미사용)
+  // @deprecated
+  @Override
+  public boolean updateReservation(Reservation reservation) {
+      return false;
+  }
+  @Override
+  public boolean addReservation(Reservation reservation) {
+      return false;
+  }
 }

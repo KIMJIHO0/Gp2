@@ -1,6 +1,7 @@
 package repository;
 
 import dao.TourDAO2;
+import model.TourPackage;
 import model.TourPackage2;
 
 import java.util.ArrayList;
@@ -35,5 +36,15 @@ public class TourRepository2 implements TourDAO2 {
   @Override
   public List<TourPackage2> findAll() {
     return new ArrayList<>(tours);
+  }
+
+  // UserDAO 1버전 임시 구현(미사용)
+  @Override
+  public Optional<? extends TourPackage> getTour(int id) {
+      return findById(id);
+  }
+  @Override
+  public List<? extends TourPackage> getAllTours() {
+    return new ArrayList<TourPackage2>(tours);
   }
 }

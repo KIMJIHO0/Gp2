@@ -30,7 +30,7 @@ public class LoginPage extends AppPage {
     @Override
     public void onPageShown(Object contextData) {
         if(context.get(SessionManager.class).isLoggedIn())
-            navigateTo(MainPage.PAGE_ID);
+            navigateTo(CatalogPage.ID, 1);
 
         // 필드 비우기
         idField.setText("");

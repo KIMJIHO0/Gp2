@@ -6,8 +6,6 @@ import java.util.Optional;
 
 
 public interface ReservationDAO {
-
-
     boolean addReservation(Reservation reservation);
     boolean updateReservation(Reservation reservation);
     Optional<? extends Reservation> getReservation(int id);

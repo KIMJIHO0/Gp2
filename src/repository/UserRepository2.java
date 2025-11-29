@@ -1,6 +1,7 @@
 package repository;
 
 import dao.UserDAO2;
+import model.User;
 import model.User2;
 
 import java.util.ArrayList;
@@ -59,4 +60,14 @@ public class UserRepository2 implements UserDAO2 {
     return users.removeIf(u->u.id==id);
   }
 
+  // UserDAO 1버전 임시 구현(미사용)
+  // @deprecated
+  @Override
+  public boolean addUser(User user) {
+      return false;
+  }
+  @Override
+  public boolean updateUser(User user) {
+      return false;
+  }
 }
