@@ -2,7 +2,7 @@ package manager;
 
 import dao.RecommendationDAO;
 import model.Recommendation;
-import model.TourPackage;
+import model.TourPackage2;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -10,10 +10,10 @@ import java.util.ArrayList;
 public class RecommendationManager {
 
     private final RecommendationDAO dao;
-    private final TourCatalog catalog;
-    private final ReservationManager reservationManager;
+    private final TourCatalog2 catalog;
+    private final ReservationManager2 reservationManager;
 
-    public RecommendationManager(RecommendationDAO dao, TourCatalog catalog, ReservationManager reservationManager) {
+    public RecommendationManager(RecommendationDAO dao, TourCatalog2 catalog, ReservationManager2 reservationManager) {
         this.dao = dao;
         this.catalog = catalog;
         this.reservationManager = reservationManager;
@@ -37,7 +37,7 @@ public class RecommendationManager {
         int lastTourId = myList.get(myList.size() - 1);
 
         // 3. 해당 상품 정보 조회
-        TourPackage lastTour = catalog.getTour(lastTourId);
+        var lastTour = catalog.getTour(lastTourId);
         if (lastTour == null) {
             return dao.getRecommendations();
         }
@@ -50,7 +50,7 @@ public class RecommendationManager {
 
         // catalog.getAllTours() 없음 → getTourIds() 순회로 대체
         for (int id : catalog.getTourIds()) {
-            TourPackage t = catalog.getTour(id);
+            var t = catalog.getTour(id);
             if (t == null) continue;
 
             if (t.price >= minPrice && t.price <= maxPrice) {

@@ -3,17 +3,22 @@ import javax.swing.SwingUtilities;
 
 // DAO 인터페이스 및 구현체 임포트
 import dao.RecommendationDAO;
-import dao.UserDAO;
-import dao.TourDAO;
-import dao.ReservationDAO;
+import dao.UserDAO2;
+import dao.TourDAO2;
+import dao.ReservationDAO2;
 import dao.ReviewDAO;
-import repository.UserRepository;
-import repository.TourRepository;
-import repository.ReservationRepository;
+import repository.UserRepository2;
+import repository.TourRepository2;
+import repository.ReservationRepository2;
 import repository.ReviewRepository;
 
 // Manager 임포트
-import manager.*;
+import manager.UserManager2;
+import manager.SessionManager;
+import manager.TourCatalog2;
+import manager.ReservationManager2;
+import manager.RecommendationManager;
+import manager.ReviewManager;
 
 // UI-Kit 및 페이지 임포트
 import ui_kit.MainFrame;
@@ -37,10 +42,10 @@ public class App_beta1 {
             // --- 1. DAO 계층 생성 ---
             // repository 폴더의 DAO 구현체 사용
             // 상품정보 외에 리뷰 등은 임시로 추가
-            UserDAO userDAO = new UserRepository("src/test_data/UserData.txt");
-            TourDAO tourDAO = new TourRepository("src/data/TourPackageData.txt");
-            ReservationDAO reservationDAO = new ReservationRepository("src/test_data/ReservationData.txt");
-            ReviewDAO reviewDAO = new ReviewRepository("src/test_data/ReviewData.txt");
+            UserDAO2 userDAO = new UserRepository2("src/data/User2Data.txt");
+            TourDAO2 tourDAO = new TourRepository2("src/data/TourPackageData2.txt");
+            ReservationDAO2 reservationDAO = new ReservationRepository2("src/data/ReservationData2.txt");
+            ReviewDAO reviewDAO = new ReviewRepository("src/data/ReviewData.txt");
             
             // RecommendationDAO는 구현체가 없으므로, 임시 익명 클래스로 생성
             RecommendationDAO recommendationDAO = new RecommendationDAO() {
@@ -51,18 +56,18 @@ public class App_beta1 {
             };
 
             // --- 2. Manager 계층 생성 (DAO 주입) ---
-            UserManager userManager = new UserManager(userDAO);
-            TourCatalog tourCatalog = new TourCatalog(tourDAO);
-            ReservationManager reservationManager = new ReservationManager(reservationDAO, userDAO, tourDAO);
+            UserManager2 userManager = new UserManager2(userDAO);
+            TourCatalog2 tourCatalog = new TourCatalog2(tourDAO);
+            ReservationManager2 reservationManager = new ReservationManager2(reservationDAO, userDAO, tourDAO);
             ReviewManager reviewManager = new ReviewManager(reviewDAO, reservationDAO, userDAO, tourDAO);
             RecommendationManager recommendationManager = new RecommendationManager(recommendationDAO, tourCatalog, reservationManager);
             SessionManager sessionManager = new SessionManager();
 
             // --- 3. ServiceContext 생성 및 모든 서비스/매니저 등록 ---
             ServiceContext context = new ServiceContext();
-            context.register(UserManager.class, userManager);
-            context.register(TourCatalog.class, tourCatalog);
-            context.register(ReservationManager.class, reservationManager);
+            context.register(UserManager2.class, userManager);
+            context.register(TourCatalog2.class, tourCatalog);
+            context.register(ReservationManager2.class, reservationManager);
             context.register(ReviewManager.class, reviewManager);
             context.register(RecommendationManager.class, recommendationManager);
             context.register(SessionManager.class, sessionManager);
@@ -81,7 +86,6 @@ public class App_beta1 {
             mainFrame.addPage(new ReviewWritePage(context));   // id: reviewWrite
             mainFrame.addPage(new LoginPage(context));
             mainFrame.addPage(new SignupPage(context));
-            mainFrame.addPage(new MainPage(context));
 
             // --- 7. 애플리케이션 실행 ---
             mainFrame.setTitle("여행 예약 시스템 (Beta 1)");

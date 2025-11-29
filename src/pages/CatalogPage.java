@@ -8,12 +8,12 @@ import pages.component.ReservationBanner;
 import pages.component.SearchBar;
 import pages.component.TourBanner;
 import manager.RecommendationManager;
-import manager.ReservationManager;
+import manager.ReservationManager2;
 import manager.ReviewManager;
 import manager.SessionManager;
-import manager.TourCatalog;
-import model.Reservation;
-import model.TourPackage;
+import manager.TourCatalog2;
+import model.Reservation2;
+import model.TourPackage2;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -43,8 +43,8 @@ public class CatalogPage extends AppPage {
     private CardLayout listLayout;
     
     private String activeMenuId = menuIds[0]; 
-    private Map<String, List<TourPackage>> cachedTourData = new HashMap<>(); 
-    private Map<Integer, Reservation> reservationMap = new HashMap<>();
+    private Map<String, List<TourPackage2>> cachedTourData = new HashMap<>(); 
+    private Map<Integer, Reservation2> reservationMap = new HashMap<>();
 
 
     public CatalogPage(ServiceContext ctx){ 
@@ -162,13 +162,13 @@ public class CatalogPage extends AppPage {
         searchBar.setRegions(new String[]{"지역"});
         searchBar.setPrices(new String[]{"가격"});
 
-        TourCatalog catalog = context.get(TourCatalog.class);
+        TourCatalog2 catalog = context.get(TourCatalog2.class);
         SessionManager session = context.get(SessionManager.class);
 
         // 1. 일반 목록
         if(id.equals(menuIds[0])){
             if (!cachedTourData.containsKey(id)) {
-                List<TourPackage> allTours = new ArrayList<>();
+                List<TourPackage2> allTours = new ArrayList<>();
                 for(int tourId : catalog.getTourIds()){
                     allTours.add(catalog.getTour(tourId));
                 }
@@ -178,17 +178,17 @@ public class CatalogPage extends AppPage {
         }
         // 2. 예약 내역
         else if(id.equals(menuIds[1])){
-            List<TourPackage> reservedPackages = new ArrayList<>();
+            List<TourPackage2> reservedPackages = new ArrayList<>();
             reservationMap.clear();
 
             if(session.isLoggedIn()){
-                ReservationManager reserves = context.get(ReservationManager.class);
+                ReservationManager2 reserves = context.get(ReservationManager2.class);
                 List<Integer> reservedIds = reserves.getListByUserId(session.getCurrentUserId().intValue());
                 
                 for(int rId : reservedIds){
-                    Reservation r = reserves.getReservation(rId);
+                    Reservation2 r = reserves.getReservation(rId);
                     if(r != null && !r.status.equals("canceled")) {
-                        TourPackage t = catalog.getTour(r.tour_id);
+                        TourPackage2 t = catalog.getTour(r.tour_id);
                         if(t != null){
                             reservedPackages.add(t);
                             reservationMap.put(t.id, r);
@@ -200,12 +200,12 @@ public class CatalogPage extends AppPage {
         }
         // 3. 추천 패키지
         else if(id.equals(menuIds[2])){
-            List<TourPackage> recommendedPackages = new ArrayList<>();
+            List<TourPackage2> recommendedPackages = new ArrayList<>();
             if(session.isLoggedIn()){
                 RecommendationManager recommender = context.get(RecommendationManager.class);
                 var recommendations = recommender.recommend(session.getCurrentUserId().intValue());
                 for(var rec : recommendations){
-                    TourPackage t = catalog.getTour(rec.getTourId());
+                    TourPackage2 t = catalog.getTour(rec.getTourId());
                     if(t != null) recommendedPackages.add(t);
                 }
             }
@@ -267,7 +267,7 @@ public class CatalogPage extends AppPage {
      * 현재 데이터 기반 필터 옵션 생성
      */
     private void initComboboxFilters(){
-        List<TourPackage> data = cachedTourData.getOrDefault(activeMenuId, new ArrayList<>());
+        List<TourPackage2> data = cachedTourData.getOrDefault(activeMenuId, new ArrayList<>());
 
         if (data.isEmpty()) {
             searchBar.setRegions(new String[]{"지역"});
@@ -277,7 +277,7 @@ public class CatalogPage extends AppPage {
 
         // 1. 지역 목록
         Set<String> regionSet = new HashSet<>();
-        for(TourPackage p : data) {
+        for(TourPackage2 p : data) {
             regionSet.add(p.place);
         }
         List<String> regions = new ArrayList<>(regionSet);
@@ -286,7 +286,7 @@ public class CatalogPage extends AppPage {
 
         // 2. 가격 구간
         int maxPrice = 0;
-        for(TourPackage p : data) {
+        for(TourPackage2 p : data) {
             if(p.price > maxPrice) maxPrice = p.price;
         }
         
@@ -312,7 +312,7 @@ public class CatalogPage extends AppPage {
         }
         searchBar.setPrices(prices.toArray(new String[0]));
 
-        // Todo - TourPackage2에 따른 추가 필터들
+        // Todo - TourPackage22에 따른 추가 필터들
         // 3. 인원수
         // searchBar.setPeoples(items);
         // 4. 교통수단
@@ -324,7 +324,7 @@ public class CatalogPage extends AppPage {
         AppPanel targetPanel = getViewOfList(menuId);
         targetPanel.removeAll(); 
         
-        List<TourPackage> sourceData = cachedTourData.getOrDefault(menuId, new ArrayList<>());
+        List<TourPackage2> sourceData = cachedTourData.getOrDefault(menuId, new ArrayList<>());
         
         // 검색어 앞뒤 공백 제거 (검색 오류 방지)
         String keyword = searchBar.getSearchText().trim().toLowerCase();
@@ -338,9 +338,9 @@ public class CatalogPage extends AppPage {
         String priceFilter = searchBar.getSelectedPriceRange();
         if(priceFilter == null) priceFilter = "가격";
         
-        List<TourPackage> filtered = new ArrayList<>();
+        List<TourPackage2> filtered = new ArrayList<>();
         
-        for(TourPackage tour : sourceData){
+        for(TourPackage2 tour : sourceData){
             boolean matchKeyword = keyword.isEmpty() || tour.name.toLowerCase().contains(keyword);
             boolean matchRegion = regionFilter.equals("지역") || tour.place.equals(regionFilter);
             boolean matchPrice = priceFilter.equals("가격") || isPriceInRange(tour.price, priceFilter);
@@ -361,9 +361,9 @@ public class CatalogPage extends AppPage {
     }
 
 
-    private void renderBanners(AppPanel panel, List<TourPackage> data, String menuId) {
+    private void renderBanners(AppPanel panel, List<TourPackage2> data, String menuId) {
         ReviewManager reviewManager = context.get(ReviewManager.class);
-        ReservationManager reservationManager = context.get(ReservationManager.class);
+        ReservationManager2 reservationManager = context.get(ReservationManager2.class);
 
         if (data.isEmpty()) {
             AppLabel emptyLabel = new AppLabel("표시할 항목이 없습니다.");
@@ -371,7 +371,7 @@ public class CatalogPage extends AppPage {
             return;
         }
         
-        for (TourPackage tour : data) {
+        for (TourPackage2 tour : data) {
             String rating = RateToStar.stringify((int)Math.round(reviewManager.getAverageRateOfTour(tour.id)));
             String duration = (tour.day_long - 1) + "박 " + tour.day_long + "일";
             String priceStr = (tour.price / 10000) + "만원";
@@ -379,7 +379,7 @@ public class CatalogPage extends AppPage {
             ActionListener detailAction = e -> navigateTo("tourDetail", Long.valueOf(tour.id));
 
             if (menuId.equals(menuIds[1])) {
-                Reservation reserve = reservationMap.get(tour.id);
+                Reservation2 reserve = reservationMap.get(tour.id);
                 if (reserve == null) continue;
 
                 boolean isCompleted = isReservationCompleted(reserve.start_date, tour.day_long);

@@ -4,12 +4,12 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import javax.swing.*;
-import manager.ReservationManager;
+import manager.ReservationManager2;
 import manager.ReviewManager;
 import manager.SessionManager;
-import manager.TourCatalog;
+import manager.TourCatalog2;
 import model.Review;
-import model.TourPackage;
+import model.TourPackage2;
 import pages.component.AppNameLabel;
 import pages.component.ImageSliderPanel;
 import pages.component.InfoRowPanel;
@@ -19,14 +19,14 @@ import ui_kit.*;
 public class PackageDetailPage extends AppPage {
 
     // 1. 매니저 (생성자에서 주입)
-    private TourCatalog tourCatalog;
-    private ReservationManager reservationManager;
+    private TourCatalog2 tourCatalog;
+    private ReservationManager2 reservationManager;
     private SessionManager sessionManager;
     private ReviewManager reviewManager;
 
     // 2. 현재 페이지의 상태
     private Long currentTourId;
-    // private TourPackage currentTour; // (실제 로드될 데이터)
+    // private TourPackage2 currentTour; // (실제 로드될 데이터)
 
     // 3. UI 컴포넌트 (ui-kit 사용)
     private AppNameLabel titleLabel;
@@ -58,8 +58,8 @@ public class PackageDetailPage extends AppPage {
     public PackageDetailPage(ServiceContext context) {
         super(context);
 
-        this.tourCatalog = context.get(TourCatalog.class);
-        this.reservationManager = context.get(ReservationManager.class);
+        this.tourCatalog = context.get(TourCatalog2.class);
+        this.reservationManager = context.get(ReservationManager2.class);
         this.sessionManager = context.get(SessionManager.class);
         this.reviewManager = context.get(ReviewManager.class);
 
@@ -347,7 +347,7 @@ public class PackageDetailPage extends AppPage {
             () -> {
                 // [백그라운드 스레드]
                 int id = tourId.intValue();
-                TourPackage tour = tourCatalog.getTour(id);
+                TourPackage2 tour = tourCatalog.getTour(id);
                 
                 if (tour == null) {
                     throw new IllegalStateException("해당 투어 정보를 찾을 수 없습니다. ID=" + id);
@@ -395,7 +395,7 @@ public class PackageDetailPage extends AppPage {
 
                 // === 여기서부터 하단 예약 바 초기화 ===
 
-                // TODO: TourPackage 안의 실제 가격 필드에 맞게 수정할 것.
+                // TODO: TourPackage2 안의 실제 가격 필드에 맞게 수정할 것.
                 // 예시: tour.pricePerPerson, tour.price, tour.basePrice 등
                 // 지금은 tour.price 라고 가정:
                 this.basePrice = tour.price;   // <-- 실제 필드명에 맞게 바꿔라
@@ -456,14 +456,14 @@ public class PackageDetailPage extends AppPage {
                 // [백그라운드 스레드]
                 int clientId = Math.toIntExact(userId);
                 int tourId = Math.toIntExact(currentTourId);
-                return reservationManager.reserve(clientId, tourId, startDate); // ResponseCode 반환
+                return reservationManager.reserve(clientId, tourId, startDate, selectedPeopleCount); // ResponseCode 반환
             },
             
             // [성공 콜백 - EDT] ResponseCode에 따른 분기
             (code) -> {
                 reserveButton.setEnabled(true);
                 // [EDT - 성공]
-                if (code == ReservationManager.ResponseCode.SUCCESS) {
+                if (code == ReservationManager2.ResponseCode.SUCCESS) {
                     // 예약 성공 → 이동 여부 묻는 확인 다이얼로그
                     String[] select = {"예약 목록", "패키지 목록", "추천 목록", "취소"};
                     int choice = JOptionPane.showOptionDialog(this, "예약이 완료되었습니다.", "예약 완료",

@@ -19,8 +19,10 @@ package pages;
 import pages.component.AccountTextField;
 import pages.component.AppNameLabel;
 import ui_kit.*;
-import manager.*;
-import model.*;
+
+import model.User2;
+import manager.UserManager2;
+import manager.SessionManager;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -186,7 +188,7 @@ public class SignupPage extends AppPage {
     private ActionListener signup_listner = _ -> {
         var sm = context.get(SessionManager.class);
         // var um = context.get(UserManager2.class);
-        var um = context.get(UserManager.class);
+        var um = context.get(UserManager2.class);
     
         // 0. 안전상 로그인 여부 다시 한 번 체크
         if(sm.isLoggedIn()){
@@ -244,8 +246,8 @@ public class SignupPage extends AppPage {
         }
 
         // 5. 가입 요청
-        // if(!um.register(uid, pw, name, age, sex_code)){
-        if(!um.register(uid, pw)){
+        if(!um.register(uid, pw, name, age, sex_code)){
+        // if(!um.register(uid, pw)){
             AppOptionPane.showMessageDialog(this, "어라, 이게 뜨면 안되는데......");
             return;
         }

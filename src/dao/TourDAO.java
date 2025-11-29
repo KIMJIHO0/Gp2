@@ -6,6 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TourDAO {
-    List<TourPackage> getAllTours();
-    Optional<TourPackage> getTour(int id);
+    List<? extends TourPackage> getAllTours();
+    Optional<? extends TourPackage> getTour(int id);
 }

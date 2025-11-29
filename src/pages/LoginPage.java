@@ -10,7 +10,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.BorderFactory;
 
-import manager.*;
+import manager.UserManager2;
+import manager.SessionManager;
+
 import ui_kit.*;
 import pages.component.AppNameLabel;
 
@@ -154,7 +156,7 @@ public class LoginPage extends AppPage {
     private void setupLoginCallback(AppButton btn){
         btn.addActionListener(e -> {
             var sm = context.get(SessionManager.class);
-            var um = context.get(UserManager.class);
+            var um = context.get(UserManager2.class);
 
             // 0. 이미 로그인 상태인데 현재 페이지일 경우
             if(sm.isLoggedIn()){

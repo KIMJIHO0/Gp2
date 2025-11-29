@@ -66,7 +66,7 @@ public class UserManager {
      * @return 비밀번호 일치 시 true, 아니면 false
      */
     public boolean checkPassword(int id, String password) {
-        Optional<User> opt = userDAO.getUser(id);
+        var opt = userDAO.getUser(id);
         if (opt.isEmpty()) return false;                  // 사용자 없음
         return Passwords.matches(password, opt.get().password);
     }

@@ -10,6 +10,6 @@ public interface ReservationDAO {
 
     boolean addReservation(Reservation reservation);
     boolean updateReservation(Reservation reservation);
-    Optional<Reservation> getReservation(int id);
-    List<Reservation> getReservationsByUser(int clientId);
+    Optional<? extends Reservation> getReservation(int id);
+    List<? extends Reservation> getReservationsByUser(int clientId);
 }

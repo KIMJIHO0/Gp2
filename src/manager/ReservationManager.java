@@ -140,7 +140,7 @@ public class ReservationManager {
      * @return 취소 결과 코드(CancelCode)
      */
     public CancelCode cancel(int reservation_id) {
-        Optional<Reservation> opt = reservationDAO.getReservation(reservation_id);
+        var opt = reservationDAO.getReservation(reservation_id);
         if (opt.isEmpty()) {
             return CancelCode.INVALID_RESERVATION;
         }

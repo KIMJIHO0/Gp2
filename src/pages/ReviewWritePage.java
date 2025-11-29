@@ -10,13 +10,13 @@ import java.awt.event.MouseEvent;
 import javax.swing.*;
 import manager.ReviewManager;
 import manager.SessionManager;
-import manager.TourCatalog;
-import model.TourPackage;
+import manager.TourCatalog2;
+import model.TourPackage2;
 import ui_kit.*;
 
 
 public class ReviewWritePage extends AppPage {
-    private TourCatalog tourCatalog;
+    private TourCatalog2 tourCatalog;
     private ReviewManager reviewManager;
     private SessionManager sessionManager;
 
@@ -39,10 +39,10 @@ public class ReviewWritePage extends AppPage {
     public ReviewWritePage(ServiceContext context) {
         super(context);
         // 필요한 매니저 주입.
-        //    - TourCatalog: 패키지 이름/정보 조회용
+        //    - TourCatalog2: 패키지 이름/정보 조회용
         //    - ReviewManager: 리뷰 작성/저장 호출용
         //    - SessionManager: 로그인 사용자 ID 확인용
-        this.tourCatalog = context.get(TourCatalog.class);
+        this.tourCatalog = context.get(TourCatalog2.class);
         this.reviewManager = context.get(ReviewManager.class);
         this.sessionManager = context.get(SessionManager.class);
         
@@ -121,7 +121,7 @@ public class ReviewWritePage extends AppPage {
     public void onPageShown(Object contextData) {
         if (contextData instanceof Long) {
             this.targetPackageId = (Long) contextData;
-            TourPackage tour = tourCatalog.getTour(targetPackageId.intValue());
+            TourPackage2 tour = tourCatalog.getTour(targetPackageId.intValue());
             packageLabel.setText(tour.name);
 
         } else {
