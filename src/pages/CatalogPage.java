@@ -86,7 +86,7 @@ public class CatalogPage extends AppPage {
         }
 
         // 없는 페이지면 0으로
-        int menu_idx = (int)ctx - 1;
+        int menu_idx = ((Long)ctx).intValue() - 1;
         sideNav.clickMenu((menu_idx < 0 || menu_idx > 2)? 0: menu_idx);
     }
 
