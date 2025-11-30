@@ -12,6 +12,7 @@ import manager.ReviewManager;
 import manager.SessionManager;
 import manager.TourCatalog2;
 import model.TourPackage2;
+import pages.component.AppNameLabel;
 import ui_kit.*;
 
 
@@ -28,12 +29,14 @@ public class ReviewWritePage extends AppPage {
     private static final int STAR_COUNT = 5; //확정된 별 개수(0~5)
 
     //ui 컴포넌트 영역
-    private AppLabel packageLabel; //리뷰를 작성할 패키지 이름
+    private AppNameLabel packageLabel; //리뷰를 작성할 패키지 이름
     private AppProgressBar loadingBar; //리뷰 저장 시 로딩 상태
     private AppTextArea reviewArea; //입력 영역
     private AppButton completeButton; //완료 버튼
     private AppButton cancelButton; //취소 버튼
     private AppLabel[] stars; //별.
+    private static final Color U_B_COLOR = UITheme.SEARCH_BAR_BG_COLOR;
+
 
 
     public ReviewWritePage(ServiceContext context) {
@@ -55,11 +58,21 @@ public class ReviewWritePage extends AppPage {
 
     private void initUI() {
         this.setLayout(new BorderLayout(10,10));
-        
-        //상품 이름(제목)----
-        packageLabel = new AppLabel("정보를 불러오는 중입니다...");
-        packageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        this.add(packageLabel, BorderLayout.NORTH);
+        // --- 상단: 제목+목록으로 나가기 버튼 ---
+        AppPanel titlePanel = new AppPanel(new BorderLayout(10,10)); //titleLabel과 backToListButton을 묶음
+        titlePanel.setPreferredSize(new Dimension(0, 80));
+        titlePanel.setOpaque(true);
+        titlePanel.setBackground(U_B_COLOR);
+        this.add(titlePanel, BorderLayout.NORTH);
+        packageLabel = new AppNameLabel("투어 정보를 로드 중입니다...");
+        try {
+            packageLabel.scale(0.7);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        titlePanel.add(packageLabel, BorderLayout.CENTER);
+        this.add(titlePanel, BorderLayout.NORTH);
 
         //중간-리뷰 내용들----
         AppTitledPanel reviewPanel = new AppTitledPanel("리뷰 작성");
@@ -82,12 +95,20 @@ public class ReviewWritePage extends AppPage {
         reviewPanel.add(loadingBar, BorderLayout.SOUTH);
 
         //하단- 작성 완료 버튼/취소 버튼
-        AppPanel buttons = new AppPanel(new FlowLayout(FlowLayout.RIGHT));
+        // --- 하단: 예약 및 기타 액션 ---
+        AppPanel actionPanel = new AppPanel(new BorderLayout(10,10)); //하단 컴포넌트를 묶음
+        actionPanel.setPreferredSize(new Dimension(0, 80));
+        actionPanel.setOpaque(true);
+        actionPanel.setBackground(U_B_COLOR);
+        this.add(actionPanel, BorderLayout.SOUTH);
+
+        AppPanel buttons = new AppPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        buttons.setBackground(null);
         completeButton = new AppButton("작성 완료");
         cancelButton = new AppButton("취소");
         buttons.add(completeButton);
         buttons.add(cancelButton);
-        this.add(buttons, BorderLayout.SOUTH);
+        actionPanel.add(buttons);
     }
 
     //이벤트 리스너 설정
