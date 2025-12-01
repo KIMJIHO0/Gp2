@@ -53,8 +53,8 @@ public class DetailedSearchBar extends AppPanel {
     private boolean isExpanded = false; // 상세 검색창 열림 여부
 
     // Icon Paths
-    private static final String ICON_ARROW_DOWN = "images/icons/arrow_down.png";
-    private static final String ICON_ARROW_UP = "images/icons/arrow_up.png";
+    private static final String ICON_ARROW_DOWN = "res/icons/arrow_down.png";
+    private static final String ICON_ARROW_UP = "res/icons/arrow_up.png";
     private static final String ICON_SEARCH = UITheme.SEARCH_ICON_PATH;
     private static final String ICON_ENTER = UITheme.RESET_ICON_PATH; // 우측 화살표 아이콘 (사용자 요청 반영)
 

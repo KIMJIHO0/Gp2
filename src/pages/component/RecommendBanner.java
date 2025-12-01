@@ -33,13 +33,13 @@ public class RecommendBanner extends AppPanel {
     /**
      * 3. (제목, 지역 기간, 가격, 평점)을 받아 생성됨.
      */
-    public RecommendBanner(String title, String region, String duration, String price, String rating, String recommend_reason) {
+    public RecommendBanner(String title, String region, String duration, String price, String headcount, String rating, String recommend_reason) {
         super(new BorderLayout(15, 0)); // 1. BorderLayout (수평 갭 15px)
         init();
         
         // 8. 텍스트 설정
         titleLabel.setText(title);
-        subLabel.setText(String.format("%s | %s | %s | %s", region, duration, price, rating));
+        subLabel.setText(String.format("%s | %s | %s | %s | %s", region, duration, price, headcount, rating));
         reasonLabel.setText(recommend_reason);
     }
 

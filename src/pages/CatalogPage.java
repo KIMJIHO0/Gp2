@@ -429,6 +429,7 @@ public class CatalogPage extends AppPage {
             String rating = RateToStar.stringify((int)Math.round(reviewManager.getAverageRateOfTour(tour.id)));
             String duration = (tour.day_long - 1) + "박 " + tour.day_long + "일";
             String priceStr = (tour.price / 10000) + "만원";
+            String head_range = tour.headcount_range[0] + "~" + tour.headcount_range[1] + "인";
             
             ActionListener detailAction = e -> navigateTo("tourDetail", Long.valueOf(tour.id));
 
@@ -450,21 +451,21 @@ public class CatalogPage extends AppPage {
                 }
 
                 ReservationBanner banner = new ReservationBanner(
-                    tour.name, tour.place, duration, priceStr, rating,
+                    tour.name, tour.place, duration, priceStr, head_range, rating,
                     isCompleted, detailAction, secondaryAction
                 );
                 panel.add(banner);
             }
             else if(menuId.equals(menuIds[2])){
                 RecommendBanner banner = new RecommendBanner(
-                    tour.name, tour.place, duration, priceStr, rating,
+                    tour.name, tour.place, duration, priceStr, head_range, rating,
                         recommend_reasons.get(i).getReason());
                 banner.addDetailButtonListener(detailAction);
                 panel.add(banner);
             }
             else {
                 TourBanner banner = new TourBanner(
-                    tour.name, tour.place, duration, priceStr, rating
+                    tour.name, tour.place, duration, priceStr, head_range, rating
                 );
                 banner.addDetailButtonListener(detailAction);
                 panel.add(banner);

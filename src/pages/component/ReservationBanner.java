@@ -35,13 +35,14 @@ public class ReservationBanner extends TourBanner {
         String region, 
         String duration, 
         String price, 
+        String headcount,
         String rating,
         boolean isCompleted,
         ActionListener detailListener,
         ActionListener secondaryListener
     ) {
         // 부모 생성자 호출 (TourBanner의 모든 초기화, BorderLayout, 텍스트 설정 등 수행)
-        super(title, region, duration, price, rating);
+        super(title, region, duration, price, headcount, rating);
         
         // 부모 클래스에서 생성된 '상세보기' 버튼에 리스너 등록
         // detailButton 필드는 TourBanner의 initEast에서 생성되었지만 protected 메서드에 의해 호출되므로

@@ -30,13 +30,13 @@ public class TourBanner extends AppPanel {
     /**
      * 3. (제목, 지역 기간, 가격, 평점)을 받아 생성됨.
      */
-    public TourBanner(String title, String region, String duration, String price, String rating) {
+    public TourBanner(String title, String region, String duration, String price, String headcount, String rating) {
         super(new BorderLayout(15, 0)); // 1. BorderLayout (수평 갭 15px)
         init();
         
         // 8. 텍스트 설정
         titleLabel.setText(title);
-        subLabel.setText(String.format("%s | %s | %s | %s", region, duration, price, rating));
+        subLabel.setText(String.format("%s | %s | %s | %s | %s", region, duration, price, headcount, rating));
     }
 
     private void init() {
