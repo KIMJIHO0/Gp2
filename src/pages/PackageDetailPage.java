@@ -15,6 +15,7 @@ import pages.component.ImageSliderPanel;
 import pages.component.InfoRowPanel;
 import ui_kit.*;
 // TODO : message 테마 일괄 변경 필요
+import util.RateToStar;
 
 public class PackageDetailPage extends AppPage {
 
@@ -650,12 +651,12 @@ public class PackageDetailPage extends AppPage {
                 DefaultListModel<String> model = new DefaultListModel<>();
 
                 for (Review r : reviews) {
-                    String line = String.format("[★%d] 작성자 %d - %s",r.rate,r.writer_id,r.content);
+                    String line = String.format("[%s] 작성자 %d - %s",RateToStar.stringify(r.rate),r.writer_id,r.content);
                     model.addElement(line);
                 }
                 double avgRate = reviewManager.getAverageRateOfTour(Math.toIntExact(currentTourId));
                 int count = reviews.size();
-                if (ratingSummaryLabel != null) ratingSummaryLabel.setText(String.format("평균 ★%.1f (%d개 리뷰)", avgRate, count));
+                if (ratingSummaryLabel != null) ratingSummaryLabel.setText(String.format("평균 %s (%d개 리뷰)", RateToStar.stringify((int)Math.round(avgRate)), count));
                 reviewList.setModel(model);
             },
             // [실패] 에러 메시지 출력
