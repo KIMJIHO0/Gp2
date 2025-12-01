@@ -3,6 +3,7 @@ package pages.component;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.List;
 import javax.swing.*;
 import ui_kit.*;
@@ -42,8 +43,8 @@ public class ImageSliderPanel extends AppPanel {
     }
 
     //더미 텍스트 리스트 기준 임시 구성
-    public void setSlids(List<String> texts) {
-        buildSlides(texts);
+    public void setSlids(List<BufferedImage> images) {
+        buildSlides(images);
         revalidate();
         repaint();
     }
@@ -60,56 +61,74 @@ public class ImageSliderPanel extends AppPanel {
 
     // ================= 내부 구현부 =================
 
-    private void buildSlides(List<String> texts) {
+    private void buildSlides(List<BufferedImage> images) {
         imgPanel.removeAll();
         currentIndex = 0;
         itemCount = 0;
 
         // 데이터가 없을 때: 기본 안내 슬라이드 하나
-        if (texts == null || texts.isEmpty()) {
-            AppLabel label = new AppLabel("표시할 이미지가 없습니다.", AppLabel.LabelType.MUTED);
-            label.setHorizontalAlignment(SwingConstants.CENTER);
-            setBackground(new Color(0,0,0));
-
-            AppPanel slide = new AppPanel(new BorderLayout());
-            slide.add(label, BorderLayout.CENTER);
-
-            imgPanel.add(slide, "empty");
-            itemCount = 1;
-            currentIndex = 0;
-            imgLayout.show(imgPanel, "empty");
+        if (images == null || images.isEmpty()) {
+            showEmptySlide("표시할 이미지가 없습니다.");
             return;
         }
 
         int i = 0;
-        for (String text : texts) {
-            // TODO: 실제 이미지 슬라이더 전환 시 여기 부분만 바꾸면 됨.
-            // 예시)
-            // AppLabel imageLabel = new AppLabel("");
-            // imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            // imageLabel.setIcon(new ImageIcon(pathOrFromDto));
-            //
-            // 지금은 더미 텍스트만 사용:
+        for (BufferedImage img : images) {
+            if (img == null) continue; //null 건너뜀
 
-            AppLabel label = new AppLabel(text, AppLabel.LabelType.TITLE);
-            label.setHorizontalAlignment(SwingConstants.CENTER);
-            // 필요 시 크기 조정
-            label.setFont(label.getFont().deriveFont(20f));
+            try {
+                // 패널 크기 기준으로 스케일링. 0 나오면 기본값 사용.
+                int targetW = getWidth() > 0 ? getWidth() : 500;
+                int targetH = getHeight() > 0 ? getHeight() : 340;
 
-            AppPanel slide = new AppPanel(new BorderLayout());
-            slide.add(label, BorderLayout.CENTER);
+                if (targetW <= 0 || targetH <= 0) {
+                    targetW = 500;
+                    targetH = 340;
+                }
 
-            String name = "slide-" + i;
-            imgPanel.add(slide, name);
-            i++;
+                Image scaled = img.getScaledInstance(targetW, targetH, Image.SCALE_SMOOTH);
+                ImageIcon icon = new ImageIcon(scaled);
+
+                AppLabel imageLabel = new AppLabel("");
+                imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                imageLabel.setIcon(icon);
+
+                AppPanel slide = new AppPanel(new BorderLayout());
+                slide.add(imageLabel, BorderLayout.CENTER);
+
+                imgPanel.add(slide, "slide-" + i);
+                i++;
+
+            } catch (Exception ex) {
+                // 이 이미지 한 장만 실패하고, 나머지는 계속 진행
+                System.err.println("이미지 슬라이드 생성 실패: " + ex.getMessage());
+                // continue; // 그냥 다음 이미지로
+            }
         }
 
         itemCount = i;
 
-        if (itemCount > 0) {
+        // 쓸 수 있는 이미지가 하나도 없으면 기본 안내 슬라이드로 대체
+        if (itemCount == 0) {
+            showEmptySlide("이미지를 불러올 수 없습니다.");
+        } else {
             showIndex(0);
         }
     }
+
+// "표시할 이미지가 없습니다" 스타일 공통 처리용
+private void showEmptySlide(String message) {
+    AppLabel label = new AppLabel(message, AppLabel.LabelType.MUTED);
+    label.setHorizontalAlignment(SwingConstants.CENTER);
+
+    AppPanel slide = new AppPanel(new BorderLayout());
+    slide.add(label, BorderLayout.CENTER);
+
+    imgPanel.add(slide, "empty");
+    itemCount = 1;
+    currentIndex = 0;
+    imgLayout.show(imgPanel, "empty");
+}
 
     private void showIndex(int index) {
         if (index < 0 || index >= itemCount) {

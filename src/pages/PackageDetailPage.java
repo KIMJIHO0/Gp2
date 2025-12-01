@@ -14,7 +14,7 @@ import pages.component.AppNameLabel;
 import pages.component.ImageSliderPanel;
 import pages.component.InfoRowPanel;
 import ui_kit.*;
-
+// TODO : message 테마 일괄 변경 필요
 
 public class PackageDetailPage extends AppPage {
 
@@ -26,7 +26,7 @@ public class PackageDetailPage extends AppPage {
 
     // 2. 현재 페이지의 상태
     private Long currentTourId;
-    // private TourPackage2 currentTour; // (실제 로드될 데이터)
+    private TourPackage2 currentTour;
 
     // 3. UI 컴포넌트 (ui-kit 사용)
     private AppNameLabel titleLabel;
@@ -34,11 +34,15 @@ public class PackageDetailPage extends AppPage {
     private AppLabel selectedDateLabel;
     private AppLabel priceLabel;
     private AppLabel plusInfoLabel;
+    private AppLabel ratingSummaryLabel;
+    private AppLabel peopleLabel;
     private AppTextField reservationDateField;
     private AppButton reserveButton;
     private AppButton backToListButton;
     private AppButton dateSelectButton;
     private AppButton peopleSelectButton;
+    private AppComboBox<Integer> peopleCombo;
+    private AppComboBox<LocalDate> dateCombo;
     private AppList<String> reviewList;
     private ImageSliderPanel imgSlider;
     private InfoRowPanel regionRow;
@@ -49,8 +53,6 @@ public class PackageDetailPage extends AppPage {
 
     private static final Color U_B_COLOR = UITheme.SEARCH_BAR_BG_COLOR;
     private int selectedPeopleCount = 1;    // 기본 인원 1명
-    private int basePrice = 0;              // TourPackage에서 가져올 예정
-
 
     /**
      * AppPage의 계약: ServiceContext를 받아 부모에게 넘기고, 필요한 매니저를 가져옵니다.
@@ -115,16 +117,13 @@ public class PackageDetailPage extends AppPage {
         // --- 1. 상세 정보 영역 (중앙 컨테이너의 상단부) ---
         AppPanel infoPanel = new AppPanel(new BorderLayout());//CENTER, SOUTH만 사용
         centerPanel.add(infoPanel, BorderLayout.NORTH);
-        AppPanel padPanel_L = new AppPanel();
-        AppPanel padPanel_R = new AppPanel();
-        infoPanel.add(padPanel_L, BorderLayout.WEST);
-        infoPanel.add(padPanel_R, BorderLayout.EAST);
+        infoPanel.setBackground(new Color(255,255,255));
 
-        AppPanel infoContain = new AppPanel(new FlowLayout(FlowLayout.CENTER, 10,10));
+        AppPanel infoContain = new AppPanel(new FlowLayout(FlowLayout.CENTER, 10,40));
         infoPanel.add(infoContain, BorderLayout.CENTER);
-        infoContain.setBackground(new Color(255,255,255));
+        infoContain.setBackground(null);
         imgSlider = new ImageSliderPanel(); 
-        imgSlider.setPreferredSize(new Dimension(500, 340)); // 원하는 사이즈로 조정
+        imgSlider.setPreferredSize(new Dimension(500, 300)); // 원하는 사이즈로 조정
         infoContain.add(imgSlider, BorderLayout.WEST); //이미지 추가
         AppPanel padPanel_C = new AppPanel();
         infoContain.add(padPanel_C);
@@ -132,32 +131,55 @@ public class PackageDetailPage extends AppPage {
         padPanel_C.setPreferredSize(new Dimension(65,80));
         
         AppPanel infoHeader = new AppPanel(new BorderLayout());//이미지 옆의 내용 추가----
-        infoHeader.setPreferredSize(new Dimension(500, 340));
+        infoHeader.setPreferredSize(new Dimension(500, 310));
+        infoHeader.setBackground(null);
         infoContain.add(infoHeader, BorderLayout.EAST);
         //infoHeader은 NORTH, CENTER, SOUTH만
 
-        infoTitle = new AppLabel("제목 로드 중...");
-        infoTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        infoTitle = new AppLabel("제목 로드 중...", AppLabel.LabelType.SUBTITLE);
+        infoTitle.setFont(getFont().deriveFont(30f));
+        infoTitle.setHorizontalAlignment(SwingConstants.LEFT);
         infoHeader.add(infoTitle, BorderLayout.NORTH);
+        AppPanel sepBarPanel = new AppPanel(new FlowLayout());
         JSeparator miniSepBar = new JSeparator(SwingConstants.HORIZONTAL);
-        infoHeader.add(miniSepBar, BorderLayout.CENTER);
-        AppPanel headerContent = new AppPanel();//NORTH CENTER SOUTH
+        miniSepBar.setPreferredSize(new Dimension(480, 1));
+        miniSepBar.setBorder(BorderFactory.createEmptyBorder(30, 0, 10, 0));
+        sepBarPanel.add(miniSepBar);
+        sepBarPanel.setBackground(null);
+        infoHeader.add(sepBarPanel, BorderLayout.CENTER);
+        AppPanel headerContent = new AppPanel(new BorderLayout());//NORTH CENTER SOUTH
         infoHeader.add(headerContent, BorderLayout.SOUTH);
+        headerContent.setPreferredSize(new Dimension(480, 250));
+        headerContent.setBackground(null);
+
+        AppPanel ratingPanel = new AppPanel(new FlowLayout(FlowLayout.RIGHT, 15,5));
+        headerContent.add(ratingPanel, BorderLayout.NORTH);
+        ratingSummaryLabel = new AppLabel("평점 정보 로드 중...", AppLabel.LabelType.NORMAL);
+        ratingSummaryLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        ratingSummaryLabel.setFont(getFont().deriveFont(16f));
+        ratingPanel.add(ratingSummaryLabel);
+        ratingPanel.setBackground(null);
         
-        // TODO: headerContent의 NORTH에 디자인상은 평균평점과 리뷰수.
-        //일시 보류gka
+
         AppPanel infoBlock = new AppPanel(new BorderLayout());
+        infoBlock.setBackground(null);
         infoBlock.setLayout(new BoxLayout(infoBlock, BoxLayout.Y_AXIS));
         headerContent.add(infoBlock, BorderLayout.SOUTH);
-        regionRow = new InfoRowPanel("지역: ", "로딩중...");
-        periodRow = new InfoRowPanel("기간: ", "로딩중...");
-        transportRow = new InfoRowPanel("이동수단: ", "로딩중...");
+        regionRow = new InfoRowPanel("지역: ", "로딩중...", AppLabel.LabelType.BOLD, AppLabel.LabelType.NORMAL);
+        periodRow = new InfoRowPanel("기간: ", "로딩중...", AppLabel.LabelType.BOLD, AppLabel.LabelType.NORMAL);
+        transportRow = new InfoRowPanel("이동수단: ", "로딩중...", AppLabel.LabelType.BOLD, AppLabel.LabelType.NORMAL);
+        regionRow.setBackground(null);
+        periodRow.setBackground(null);
+        transportRow.setBackground(null);
+        regionRow.setFont(getFont().deriveFont(20f));
         infoBlock.add(regionRow);
         infoBlock.add(periodRow);
         infoBlock.add(transportRow);
+        // TODO : infoBlock/breifInfoBlock들 텍스트 크기 조정
 
         AppPanel breifInfo = new AppPanel(new BorderLayout()); //north south는 bar자리
         infoPanel.add(breifInfo, BorderLayout.SOUTH);
+        breifInfo.setBackground(null);
         JSeparator subSepBar_U = new JSeparator(SwingConstants.HORIZONTAL);
         breifInfo.add(subSepBar_U, BorderLayout.NORTH);
         JSeparator subSepBar_B = new JSeparator(SwingConstants.HORIZONTAL);
@@ -165,19 +187,26 @@ public class PackageDetailPage extends AppPage {
         AppPanel breifInfoBlock = new AppPanel();
         breifInfoBlock.setLayout(new BoxLayout(breifInfoBlock, BoxLayout.Y_AXIS));
         breifInfo.add(breifInfoBlock, BorderLayout.WEST);
+        breifInfoBlock.setBackground(null);
         scheduleRow = new InfoRowPanel("일정", "로딩중...");
         reservationStatusRow = new InfoRowPanel("예약현황", "로딩중...");
+        scheduleRow.setBackground(null);
+        reservationStatusRow.setBackground(null);
         breifInfoBlock.add(scheduleRow);
         breifInfoBlock.add(reservationStatusRow);
 
-        // --- 2. 추가 상세 정보 영역(필요시 작성, 현재는 더미 페이지만.) ---
+        // --- 2. 추가 상세 정보 영역 ---
+        // TODO : UI디자인 수정 필요
         AppPanel plusInfoPanel = new AppPanel(new BorderLayout());
         centerPanel.add(plusInfoPanel, BorderLayout.CENTER);
+        plusInfoPanel.setBackground(null);
         plusInfoLabel = new AppLabel("여기에 내용을 넣을 수 있습니다.");
+        plusInfoLabel.setFont(getFont().deriveFont(20f));
         plusInfoLabel.setHorizontalAlignment(SwingConstants.CENTER);
         plusInfoPanel.add(plusInfoLabel, BorderLayout.NORTH);
 
         // --- 3. 리뷰 영역, 일단은 기존 상태 그대로 붙임. ---
+        // TODO : 리뷰 칸 축소, 디자인 수정, 내부에도 스크롤이 있어 전체 페이지 스크롤에 방해가 되는 문제
         AppTitledPanel reviewPanel = new AppTitledPanel("리뷰");
         reviewPanel.setLayout(new BorderLayout(5, 5));
         centerPanel.add(reviewPanel, BorderLayout.SOUTH);
@@ -199,9 +228,15 @@ public class PackageDetailPage extends AppPage {
         // 1) 날짜 선택 버튼 + 선택된 날짜 라벨
         dateSelectButton = new AppButton("날짜 선택");
         selectedDateLabel = new AppLabel("날짜 미선택", AppLabel.LabelType.SMALL);
+        dateCombo = new AppComboBox<>();
+        dateCombo.setVisible(false);   // 처음엔 숨김
 
         // 2) 인원 선택 버튼 + 금액 라벨 (이벤트는 다음 단계에서)
         peopleSelectButton = new AppButton("인원 선택");
+        peopleLabel = new AppLabel("인원", AppLabel.LabelType.BOLD);
+        peopleCombo = new AppComboBox<>();
+        peopleCombo.setVisible(false); // 처음엔 숨김
+
         priceLabel = new AppLabel("0", AppLabel.LabelType.SMALL);
         AppLabel wonLabel = new AppLabel("만원", AppLabel.LabelType.SMALL);
 
@@ -211,7 +246,10 @@ public class PackageDetailPage extends AppPage {
         // 한 줄에 순서대로 배치
         actionRowPanel.add(dateSelectButton);
         actionRowPanel.add(selectedDateLabel);
+        actionRowPanel.add(dateCombo); 
         actionRowPanel.add(peopleSelectButton);
+        actionRowPanel.add(peopleCombo);
+        actionRowPanel.add(peopleLabel);
         actionRowPanel.add(priceLabel);
         actionRowPanel.add(wonLabel);
         actionRowPanel.add(reserveButton);
@@ -230,72 +268,55 @@ public class PackageDetailPage extends AppPage {
         reserveButton.addActionListener(e -> {
             handleReservation();
         });
+        
+        // "인원 선택" 버튼 클릭 -> 콤보박스 토글 + 드롭다운 열기
+        peopleSelectButton.addActionListener(e -> {
+            if (peopleCombo == null) return;
 
-        // "날짜 선택" 버튼 클릭 -> 날짜 입력받기
-        dateSelectButton.addActionListener(e -> {
-            String input = JOptionPane.showInputDialog(
-                this,
-                "희망 날짜를 입력해주세요 (예: 2025-11-18)",
-                "날짜 선택",
-                JOptionPane.PLAIN_MESSAGE
-            );
+            boolean visible = peopleCombo.isVisible();
+            peopleCombo.setVisible(true);
+            peopleSelectButton.setVisible(false);
 
-            // 취소하거나 빈 입력이면 무시
-            if (input == null || input.isBlank()) {
-                return;
-            }
-
-            input = input.trim();
-
-            try {
-                // 형식 검증 (yyyy-MM-dd)
-                LocalDate parsed = LocalDate.parse(input);
-
-                // 라벨에 표시
-                selectedDateLabel.setText(parsed.toString());
-
-                // 예약 로직에서 쓰기 위해 내부 필드에도 세팅
-                reservationDateField.setText(parsed.toString());
-
-            } catch (DateTimeParseException ex) {
-                JOptionPane.showMessageDialog(
-                    this,
-                    "날짜 형식이 올바르지 않습니다.\n예: 2025-11-18",
-                    "오류",
-                    JOptionPane.ERROR_MESSAGE
-                );
+            if (!visible) {
+                // 처음 보여줄 때 바로 드롭다운 펼치기
+                peopleCombo.requestFocusInWindow();
+                peopleCombo.showPopup();
             }
         });
-
-        // "인원 선택" 버튼 클릭 -> 인원 입력 + 금액 재계산
-        peopleSelectButton.addActionListener(e -> {
-            String input = JOptionPane.showInputDialog(this,"인원 수를 입력해주세요 (예: 1, 2, 3...)",
-                "인원 선택",JOptionPane.PLAIN_MESSAGE);
-
-            // 취소 또는 공백이면 무시
-            if (input == null || input.isBlank()) return;
-
-            input = input.trim();
-
-            try {
-                int people = Integer.parseInt(input);
-
-                if (people <= 0) {
-                    JOptionPane.showMessageDialog(this,"인원 수는 1명 이상이어야 합니다.",
-                    "오류",JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                // TODO: 필요하면 최대 인원 제한도 여기서 체크
-                selectedPeopleCount = people;
-
-                // 금액 라벨 갱신
+        // 콤보 박스 변경시 인원/가격 갱신
+        peopleCombo.addActionListener(e -> {
+            Object sel = peopleCombo.getSelectedItem();
+            if (sel instanceof Integer i) {
+                selectedPeopleCount = i;
                 updatePriceLabel();
-
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "인원 수는 숫자로 입력해주세요.",
-                "오류",JOptionPane.ERROR_MESSAGE);
+                peopleLabel.setText("인원: " + i + "명");
             }
+            peopleSelectButton.setVisible(true);
+            peopleCombo.setVisible(false);
+        });
+        // "날짜 선택" 버튼 클릭 -> 콤보박스 토글 + 드롭다운 열기
+        dateSelectButton.addActionListener(e -> {
+            if (dateCombo == null) return;
+            if (!dateCombo.isEnabled()) return; // 예약 가능한 날짜 없을 때 방어
+
+            boolean visible = dateCombo.isVisible();
+            dateCombo.setVisible(true);
+            dateSelectButton.setVisible(false);
+
+            if (!visible) {
+                dateCombo.requestFocusInWindow();
+                dateCombo.showPopup();
+            }
+        });
+        dateCombo.addActionListener(e -> {
+            Object sel = dateCombo.getSelectedItem();
+            if (sel instanceof LocalDate d) {
+                String text = d.toString();           // "2025-12-01" 형식
+                selectedDateLabel.setText(text);      // 화면에 표시
+                reservationDateField.setText(text);   // 예약 로직에서 쓰는 값
+            }
+            dateSelectButton.setVisible(true);
+            dateCombo.setVisible(false);
         });
     }
     
@@ -355,14 +376,15 @@ public class PackageDetailPage extends AppPage {
                 return tour;
             },
             (tour) -> {
+                this.currentTour = tour;
                 titleLabel.setText(tour.name);
                 infoTitle.setText(tour.name);
-
-                imgSlider.setSlids(java.util.List.of(
-                    "슬라이드 1: 더미",
-                    "슬라이드 2: 더미",
-                    "슬라이드 3: 더미"
-                ));
+                // 이미지 슬라이더 실제 이미지 적용
+                if (tour.shots != null && tour.shots.length > 0) {
+                    imgSlider.setSlids(java.util.Arrays.asList(tour.shots));
+                } else {
+                    imgSlider.setSlids(java.util.List.of());   // 빈 슬라이드 표시
+                }
                 // 상단 infoBlock 값 채우기
                 if (regionRow != null) {
                     regionRow.setValue(tour.place); // 지역
@@ -370,16 +392,45 @@ public class PackageDetailPage extends AppPage {
                 if (periodRow != null) {
                     periodRow.setValue(tour.day_long + "일"); // 기간
                 }
-                
-                // TODO : 이동수단 임시값
                 if (transportRow != null) {
-                    //transportRow.setValue(tour.transport != null ? tour.transport : "-");
-                    transportRow.setValue("버스");
+                    String[] transport = tour.transport;
+                    String transportText;
+                    if (transport == null || transport.length == 0) {
+                        transportText = "-";
+                    } else {
+                        transportText = String.join(", ", transport);
+                    }
+
+                    transportRow.setValue(transportText);
                 }
-                // TODO : breifInfoBlock 값 채우기 (일정/예약현황은 일단 임시 값)
-                if (scheduleRow != null) scheduleRow.setValue("총 " + tour.day_long + "일 일정");
-                // TODO : 실제 예약 현황 로직 생기면 교체
-                if (reservationStatusRow != null) reservationStatusRow.setValue("예약 가능");
+                if (scheduleRow != null) {
+                    java.util.List<String> schedule = tour.schedule;  // 이미 plusInfoLabel 만들 때 쓰던 그 배열
+
+                    String text;
+                    if (schedule == null || schedule.isEmpty()) {
+                        text = "일정 정보가 없습니다.";
+                    } else if (schedule.size() == 1) {
+                        // 1일짜리거나 한 줄만 있을 때
+                        text = "1일 일정 - " + schedule.get(0);
+                    } else {
+                        text = String.join("-", schedule);
+                    }
+                    scheduleRow.setValue(text);
+                }
+                if (reservationStatusRow != null) {
+                    int min = 0;
+                    int max = 0;
+                    if (tour.headcount_range != null && tour.headcount_range.length >= 2) {
+                        min = tour.headcount_range[0];
+                        max = tour.headcount_range[1];
+                    }
+                    // TODO: 지금까지 예약된 인원으로 변경 가능하면 수정
+                    int current = 0;
+                    String statusText = String.format(
+                        "현재 %d명  |  최대 %d명  |  최소출발인원 %d명", current, max, min);
+                        
+                    reservationStatusRow.setValue(statusText);
+                }
                     
                 // 상세 정보 문자열 구성
                 StringBuilder sb = new StringBuilder();
@@ -395,15 +446,50 @@ public class PackageDetailPage extends AppPage {
 
                 // === 여기서부터 하단 예약 바 초기화 ===
 
-                // TODO: TourPackage2 안의 실제 가격 필드에 맞게 수정할 것.
-                // 예시: tour.pricePerPerson, tour.price, tour.basePrice 등
-                // 지금은 tour.price 라고 가정:
-                this.basePrice = tour.price;   // <-- 실제 필드명에 맞게 바꿔라
-                this.selectedPeopleCount = 1; // 기본 인원 1명으로 초기화
-                updatePriceLabel(); // 금액 라벨 갱신
+                int max = 1;
+                if (tour.headcount_range != null && tour.headcount_range.length >= 2) {
+                    max = tour.headcount_range[1];
+                }
+                if (max < 1) max = 1;
+                // 콤보 옵션 채우기: 1 ~ max
+                peopleCombo.removeAllItems();
+                for (int i = 1; i <= max; i++) {
+                    peopleCombo.addItem(i);
+                }
+                peopleCombo.setSelectedItem(selectedPeopleCount);
+                // ★ peopleLabel 초기 표시
+                if (peopleLabel != null) {
+                    peopleLabel.setText("인원: " + selectedPeopleCount + "명");
+                }
+                updatePriceLabel();
+                // === 날짜 콤보 옵션 채우기 ===
+                if (dateCombo != null) {
+                    dateCombo.removeAllItems();
 
-                // 날짜/라벨 초기화 (선택)
-                if (selectedDateLabel != null) selectedDateLabel.setText("날짜 미선택");
+                    // 오늘부터 N일치 중에서 예약 가능 날짜만 넣기 (N은 적당히 조절)
+                    LocalDate today = LocalDate.now();
+                    int added = 0;
+
+                    for (int i = 0; i < 60; i++) { // 60일치 예시
+                        LocalDate d = today.plusDays(i);
+                        if (tourCatalog.checkDateValidate(tour, d)) {
+                            dateCombo.addItem(d);
+                            added++;
+                        }
+                    }
+
+                    if (added == 0) {
+                        dateSelectButton.setEnabled(false);
+                        selectedDateLabel.setText("예약 가능한 날짜 없음");
+                        reservationDateField.setText("");
+                    } else {
+                        dateSelectButton.setEnabled(true);
+                        // 기본값은 '미선택' 유지 → 콤보 선택도 비우기
+                        dateCombo.setSelectedIndex(-1);
+                        selectedDateLabel.setText("날짜 미선택");
+                        reservationDateField.setText("");
+                    }
+                }
 
                 loadReviewsForCurrentTour(tourId);
             },
@@ -446,6 +532,27 @@ public class PackageDetailPage extends AppPage {
             JOptionPane.showMessageDialog(this,"날짜 형식이 올바르지 않습니다. 예: 2025-11-18","오류",JOptionPane.ERROR_MESSAGE);
             return;
         }
+        //날짜 유효성 검증
+        boolean dateOk = tourCatalog.checkDateValidate(currentTour, startDate);
+        if (!dateOk) {
+            JOptionPane.showMessageDialog(this,"해당 날짜에는 예약할 수 없습니다.\n(예약 불가 날짜입니다.)","오류",JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        //인원수 범위 검증
+        boolean headcountOk = tourCatalog.checkHeadcountValidate(currentTour, selectedPeopleCount);
+        if (!headcountOk) {
+            int min = 0;
+            int max = 0;
+            if (currentTour.headcount_range != null && currentTour.headcount_range.length >= 2) {
+                min = currentTour.headcount_range[0];
+                max = currentTour.headcount_range[1];
+            }
+
+            String msg = String.format("인원 수가 허용 범위를 벗어났습니다.\n(최소 %d명, 최대 %d명)",min,max);
+            JOptionPane.showMessageDialog(this,msg,"오류",JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
 
         // 버튼 잠깐 막아두기
         reserveButton.setEnabled(false);
@@ -498,10 +605,14 @@ public class PackageDetailPage extends AppPage {
         );
     }
 
-    // 하단 금액 라벨을 현재 basePrice × selectedPeopleCount 값으로 갱신
     private void updatePriceLabel() {
-        if (priceLabel == null) return;  // 아직 UI 초기화 전일 수 있으니 방어
-        int total = basePrice * selectedPeopleCount;
+        if (priceLabel == null) return;
+        // 투어 정보가 아직 없으면 0 표시
+        if (currentTour == null) {
+            priceLabel.setText("0");
+            return;
+        }
+        int total = tourCatalog.totalPrice(currentTour, selectedPeopleCount);
         priceLabel.setText(String.valueOf(total));
     }
 
@@ -538,22 +649,13 @@ public class PackageDetailPage extends AppPage {
             reviews -> {
                 DefaultListModel<String> model = new DefaultListModel<>();
 
-                if (reviews.isEmpty()) {
-                    model.addElement("등록된 리뷰가 없습니다.");
-                } else {
-                    for (Review r : reviews) {
-                        // 원하는 형식으로 한 줄 문자열 구성
-                        // 필요하면 줄 나누기나 포맷 더 다듬어도 됨
-                        String line = String.format(
-                            "[★%d] 작성자 %d - %s",
-                            r.rate,
-                            r.writer_id,
-                            r.content
-                        );
-                        model.addElement(line);
-                    }
+                for (Review r : reviews) {
+                    String line = String.format("[★%d] 작성자 %d - %s",r.rate,r.writer_id,r.content);
+                    model.addElement(line);
                 }
-
+                double avgRate = reviewManager.getAverageRateOfTour(Math.toIntExact(currentTourId));
+                int count = reviews.size();
+                if (ratingSummaryLabel != null) ratingSummaryLabel.setText(String.format("평균 ★%.1f (%d개 리뷰)", avgRate, count));
                 reviewList.setModel(model);
             },
             // [실패] 에러 메시지 출력
