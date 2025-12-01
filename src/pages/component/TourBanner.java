@@ -13,6 +13,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 
 /**
  * 패키지 여행 1개 항목을 보여주는 배너 컴포넌트 (이미지 1개)
@@ -87,19 +88,19 @@ public class TourBanner extends AppPanel {
         add(buttonWrapper, BorderLayout.EAST);
     }
 
-    /**
-     * 5. 썸네일(사진 경로)을 받아 스케일링하여 WEST에 배치
-     * @param imagePath
+/**
+     * 5. 썸네일(BufferedImage)을 받아 스케일링하여 WEST에 배치
+     * @param image 이미지 객체 (null일 경우 이미지 없음 처리)
      */
-    public void setThumbnail(String imagePath) {
+    public void setThumbnail(BufferedImage image) {
         boolean success = false;
-        if (imagePath != null && !imagePath.isEmpty()) {
-            try {
-                ImageIcon originalIcon = new ImageIcon(imagePath);
-                Image originalImage = originalIcon.getImage();
 
+        // 이미지 객체가 null이 아닌지 확인
+        if (image != null) {
+            try {
                 // 썸네일 크기에 맞게 스케일링
-                Image scaledImage = originalImage.getScaledInstance(
+                // (BufferedImage는 Image의 자식 클래스이므로 바로 스케일링 가능)
+                Image scaledImage = image.getScaledInstance(
                     UITheme.TOUR_BANNER_THUMBNAIL_SIZE.width, 
                     UITheme.TOUR_BANNER_THUMBNAIL_SIZE.height, 
                     Image.SCALE_SMOOTH
@@ -113,18 +114,18 @@ public class TourBanner extends AppPanel {
             } catch (Exception e) {
                 e.printStackTrace();
                 thumbnailLabel.setIcon(null);
-                thumbnailLabel.setText("Load Error"); // 로드 실패 시
+                thumbnailLabel.setText("Error"); // 변환 중 에러 발생 시
                 success = false;
             }
         } else {
              thumbnailLabel.setIcon(null);
-             thumbnailLabel.setText("No Image"); // 이미지 경로가 없을 때
+             thumbnailLabel.setText("No Image"); // 전달된 이미지가 null일 때
              success = false;
         }
 
         // --- (수정) 썸네일 유무에 따라 크기와 가시성 제어 ---
         if (success) {
-            // 이미지가 있으면: 크기 80x80, 보이게
+            // 이미지가 있으면: 크기 설정, 보이게
             thumbnailLabel.setPreferredSize(UITheme.TOUR_BANNER_THUMBNAIL_SIZE);
             thumbnailLabel.setVisible(true);
         } else {

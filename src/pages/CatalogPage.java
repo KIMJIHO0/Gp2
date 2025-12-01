@@ -27,6 +27,8 @@ import java.util.HashSet;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.awt.Image;
 import java.time.LocalDate;
 import java.lang.Math;
 import javax.swing.BoxLayout;
@@ -413,6 +415,8 @@ public class CatalogPage extends AppPage {
     }
 
 
+    // 리사이징된 이미지 캐싱
+    private Map<Integer, BufferedImage> thumbnailCache = new HashMap<>();
     private void renderBanners(AppPanel panel, List<TourPackage2> data, String menuId) {
         ReviewManager reviewManager = context.get(ReviewManager.class);
         ReservationManager2 reservationManager = context.get(ReservationManager2.class);
@@ -423,6 +427,9 @@ public class CatalogPage extends AppPage {
             return;
         }
         
+        // 이미지 리사이징 & 캐싱
+        prepareThumbnails(data);
+
         // 아무리 급해서라지만 이딴 방법을 쓰게 될 줄은...
         int i = 0;
         for (TourPackage2 tour : data) {
@@ -454,12 +461,14 @@ public class CatalogPage extends AppPage {
                     tour.name, tour.place, duration, priceStr, head_range, rating,
                     isCompleted, detailAction, secondaryAction
                 );
+                banner.setThumbnail(thumbnailCache.get(tour.id));
                 panel.add(banner);
             }
             else if(menuId.equals(menuIds[2])){
                 RecommendBanner banner = new RecommendBanner(
                     tour.name, tour.place, duration, priceStr, head_range, rating,
                         recommend_reasons.get(i).getReason());
+                banner.setThumbnail(thumbnailCache.get(tour.id));
                 banner.addDetailButtonListener(detailAction);
                 panel.add(banner);
             }
@@ -468,10 +477,37 @@ public class CatalogPage extends AppPage {
                     tour.name, tour.place, duration, priceStr, head_range, rating
                 );
                 banner.addDetailButtonListener(detailAction);
+                banner.setThumbnail(thumbnailCache.get(tour.id));
                 panel.add(banner);
             }
 
             i++;
+        }
+    }
+
+
+    private void prepareThumbnails(List<TourPackage2> tours) {
+        if (tours == null) return;
+        
+        int w = UITheme.TOUR_BANNER_THUMBNAIL_SIZE.width;
+        int h = UITheme.TOUR_BANNER_THUMBNAIL_SIZE.height;
+
+        for (TourPackage2 t : tours) {
+            // 이미 캐시에 있으면 스킵
+            if (thumbnailCache.containsKey(t.id)) continue;
+
+            // t.thumbnailImage가 원본 BufferedImage라고 가정
+            // (만약 t.thumbnail이 경로 String이라면 여기서 ImageIO.read로 읽으세요)
+            if (t.thumbnail != null) {
+                // 여기서 딱 한 번만 리사이징 수행!
+                Image scaled = t.thumbnail.getScaledInstance(w, h, Image.SCALE_SMOOTH);
+                
+                // Image -> BufferedImage 변환 (Swing 성능 최적화를 위해)
+                BufferedImage bImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+                bImg.getGraphics().drawImage(scaled, 0, 0, null);
+                
+                thumbnailCache.put(t.id, bImg);
+            }
         }
     }
 }

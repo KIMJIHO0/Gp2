@@ -40,7 +40,7 @@ public class App_beta2 {
             // --- 1. DAO 계층 생성 ---
             // repository 폴더의 DAO 구현체 사용
             // 상품정보 외에 리뷰 등은 임시로 추가
-            UserDAO2 userDAO = new UserRepository2("src/data/User2Data.txt");
+            UserDAO2 userDAO = new UserRepository2("src/data/UserData2.txt");
             TourDAO2 tourDAO = new TourRepository2("src/data/TourPackageData2.txt");
             ReservationDAO2 reservationDAO = new ReservationRepository2("src/data/ReservationData2.txt");
             ReviewDAO reviewDAO = new ReviewRepository("src/data/ReviewData.txt");
