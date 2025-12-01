@@ -2,64 +2,122 @@ package manager;
 
 import dao.RecommendationDAO;
 import model.Recommendation;
+import model.TourPackage2;
+import model.User2;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class RecommendationManager {
 
     private final RecommendationDAO dao;
-    private final TourCatalog2 catalog;
-    private final ReservationManager2 reservationManager;
 
-    public RecommendationManager(RecommendationDAO dao, TourCatalog2 catalog, ReservationManager2 reservationManager) {
+    public RecommendationManager(RecommendationDAO dao) {
         this.dao = dao;
-        this.catalog = catalog;
-        this.reservationManager = reservationManager;
     }
 
-    /**
-     * userId 기반 추천
-     * - 최근 예약한 상품 가격대와 비슷한 여행 추천
-     */
-    public List<Recommendation> recommend(int userId) {
+    public List<Recommendation> recommend(User2 user) {
 
-        // 1. 사용자의 예약 목록
-        var myList = reservationManager.getListByUserId(userId);
+        //추천 결과(중복 제거는 뒤에서)
+        List<Recommendation> results = new ArrayList<>();
 
-        if (myList.isEmpty()) {
-            // 예약이 없으면 기본 추천 반환
-            return dao.getRecommendations();
+        //나이,성별 기반 추천 
+        List<Integer> idsByDemo = dao.getDemographicRecommendedTourIds(user);
+        for (int id : idsByDemo) {
+            TourPackage2 t = dao.getTourById(id);
+            if (t != null) results.add(
+                    new Recommendation(t.id, "나이/성별 기반 추천 (" + user.age + "세, " + (user.sex==User2.Sex.MALE?"남":"여") + ")")
+            );
         }
 
-        // 2. 최근 예약한 여행 상품 ID
-        int lastTourId = myList.get(myList.size() - 1);
+        //사용자의 예약 내역
+        List<TourPackage2> history = dao.getUsedTourPackages(user.id);
 
-        // 3. 해당 상품 정보 조회
-        var lastTour = catalog.getTour(lastTourId);
-        if (lastTour == null) {
-            return dao.getRecommendations();
+        if (!history.isEmpty()) {
+            results.addAll(recommendByUserPreferences(history));
+            results.addAll(recommendByLastPrice(history));
         }
 
-        int lastPrice = lastTour.price;
-        int minPrice = lastPrice - 50000;  // -5만원
-        int maxPrice = lastPrice + 50000;  // +5만원
+        //tourId 기준으로 중복 제거
+        Map<Integer, Recommendation> dedup = new LinkedHashMap<>();
+        for (Recommendation r : results) {
+            dedup.putIfAbsent(r.getTourId(), r);
+        }
+
+        return new ArrayList<>(dedup.values());
+    }
+
+    //사용자 선호 기반 추천 (지역/가격/교통) 
+    private List<Recommendation> recommendByUserPreferences(List<TourPackage2> history) {
+
+        // 선호 지역
+        String favPlace = history.stream()
+                .collect(Collectors.groupingBy(t -> t.place, Collectors.counting()))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+
+        // 평균 가격
+        double avgPrice = history.stream()
+                .mapToInt(t -> t.price)
+                .average().orElse(0);
+
+        // 선호 교통수단
+        String favTransport = history.stream()
+                .collect(Collectors.groupingBy(t -> t.transport[0], Collectors.counting()))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
 
         List<Recommendation> result = new ArrayList<>();
 
-        // catalog.getAllTours() 없음 → getTourIds() 순회로 대체
-        for (int id : catalog.getTourIds()) {
-            var t = catalog.getTour(id);
-            if (t == null) continue;
+        for (TourPackage2 t : getAllTours()) {
+            boolean ok = true;
 
-            if (t.price >= minPrice && t.price <= maxPrice) {
+            if (favPlace != null && !t.place.equals(favPlace)) ok = false;
+            if (favTransport != null && !t.transport[0].equals(favTransport)) ok = false;
+            if (t.price < avgPrice - 50000 || t.price > avgPrice + 50000) ok = false;
+
+            if (ok) {
                 result.add(new Recommendation(
                         t.id,
-                        "최근 예약(" + lastPrice + "원)과 비슷한 가격대 추천"
+                        "사용자 선호 기반 추천 (지역/가격/교통)"
                 ));
             }
         }
-
         return result;
+    }
+
+    //최근 예약 가격대 기반 추천 
+    private List<Recommendation> recommendByLastPrice(List<TourPackage2> history) {
+
+        TourPackage2 last = history.get(history.size() - 1);
+        int price = last.price;
+        int min = price - 50000;
+        int max = price + 50000;
+
+        List<Recommendation> result = new ArrayList<>();
+
+        for (TourPackage2 t : getAllTours()) {
+            if (t.price >= min && t.price <= max) {
+                result.add(new Recommendation(
+                        t.id,
+                        "최근 예약 가격대와 유사한 추천"
+                ));
+            }
+        }
+        return result;
+    }
+
+    //DAO에 전체 조회 기능이 없으므로 보조 메서드 사용
+    private List<TourPackage2> getAllTours() {
+        List<TourPackage2> list = new ArrayList<>();
+        for (int id = 1; id <= 1000; id++) {
+            TourPackage2 t = dao.getTourById(id);
+            if (t != null) list.add(t);
+        }
+        return list;
     }
 }

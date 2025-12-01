@@ -193,6 +193,7 @@ public class UITheme {
     public static final Dimension TOUR_BANNER_THUMBNAIL_SIZE = new Dimension(93, 93); // 썸네일 이미지 크기
     public static final Font TOUR_BANNER_TITLE_FONT = FONT_BOLD.deriveFont(16f); // 제목(h4) 폰트 (예: 16pt 굵게)
     public static final Font TOUR_BANNER_SUB_FONT = FONT_BASE.deriveFont(13f); // 부가정보(지역, 기간 등) 폰트 (예: 13pt 보통)
+    public static final Font RECOMEMND_BANNER_REASON_FONT = FONT_BASE.deriveFont(12f);
     public static final Color TOUR_BANNER_SUB_FG_COLOR = Color.BLACK; // 부가정보 텍스트 색상
     public static final Border TOUR_BANNER_PADDING = BorderFactory.createEmptyBorder(16, 16, 16, 16); // 전체 배너 패널의 내부 여백 (상하좌우 16)
     public static final Color TOUR_BANNER_BG_COLOR = new Color(0, 0, 0, 0); // 전체 배너 배경색 (투명)

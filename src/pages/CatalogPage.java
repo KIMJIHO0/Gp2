@@ -4,6 +4,7 @@ import ui_kit.*;
 import util.RateToStar;
 import pages.component.Sidebar;
 import pages.component.DetailedSearchBar;
+import pages.component.RecommendBanner;
 import pages.component.ReservationBanner;
 import pages.component.TourBanner;
 import manager.RecommendationManager;
@@ -11,6 +12,8 @@ import manager.ReservationManager2;
 import manager.ReviewManager;
 import manager.SessionManager;
 import manager.TourCatalog2;
+import manager.UserManager2;
+import model.Recommendation;
 import model.Reservation2;
 import model.TourPackage2;
 
@@ -41,6 +44,7 @@ public class CatalogPage extends AppPage {
     private Map<String, AppScrollPane> packageLists = new HashMap<>(); 
     private AppPanel listContainer;
     private CardLayout listLayout;
+    private List<Recommendation> recommend_reasons;
     
     private String activeMenuId = menuIds[0]; 
     private Map<String, List<TourPackage2>> cachedTourData = new HashMap<>(); 
@@ -203,8 +207,10 @@ public class CatalogPage extends AppPage {
             List<TourPackage2> recommendedPackages = new ArrayList<>();
             if(session.isLoggedIn()){
                 RecommendationManager recommender = context.get(RecommendationManager.class);
-                var recommendations = recommender.recommend(session.getCurrentUserId().intValue());
-                for(var rec : recommendations){
+                recommend_reasons = recommender.recommend(
+                    context.get(UserManager2.class).getUser(session.getCurrentUserId().intValue())
+                );
+                for(var rec : recommend_reasons){
                     TourPackage2 t = catalog.getTour(rec.getTourId());
                     if(t != null) recommendedPackages.add(t);
                 }
@@ -417,6 +423,8 @@ public class CatalogPage extends AppPage {
             return;
         }
         
+        // 아무리 급해서라지만 이딴 방법을 쓰게 될 줄은...
+        int i = 0;
         for (TourPackage2 tour : data) {
             String rating = RateToStar.stringify((int)Math.round(reviewManager.getAverageRateOfTour(tour.id)));
             String duration = (tour.day_long - 1) + "박 " + tour.day_long + "일";
@@ -447,6 +455,13 @@ public class CatalogPage extends AppPage {
                 );
                 panel.add(banner);
             }
+            else if(menuId.equals(menuIds[2])){
+                RecommendBanner banner = new RecommendBanner(
+                    tour.name, tour.place, duration, priceStr, rating,
+                        recommend_reasons.get(i).getReason());
+                banner.addDetailButtonListener(detailAction);
+                panel.add(banner);
+            }
             else {
                 TourBanner banner = new TourBanner(
                     tour.name, tour.place, duration, priceStr, rating
@@ -454,6 +469,8 @@ public class CatalogPage extends AppPage {
                 banner.addDetailButtonListener(detailAction);
                 panel.add(banner);
             }
+
+            i++;
         }
     }
 }

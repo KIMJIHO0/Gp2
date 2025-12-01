@@ -11,6 +11,7 @@ import repository.UserRepository2;
 import repository.TourRepository2;
 import repository.ReservationRepository2;
 import repository.ReviewRepository;
+import repository.RecommendationRepository;
 
 // Manager 임포트
 import manager.UserManager2;
@@ -25,9 +26,6 @@ import ui_kit.MainFrame;
 import ui_kit.ServiceContext;
 import pages.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import model.Recommendation;
 
 /**
  * 애플리케이션의 메인 엔트리 포인트 (베타 1).
@@ -46,21 +44,14 @@ public class App_beta2 {
             TourDAO2 tourDAO = new TourRepository2("src/data/TourPackageData2.txt");
             ReservationDAO2 reservationDAO = new ReservationRepository2("src/data/ReservationData2.txt");
             ReviewDAO reviewDAO = new ReviewRepository("src/data/ReviewData.txt");
-            
-            // RecommendationDAO는 구현체가 없으므로, 임시 익명 클래스로 생성
-            RecommendationDAO recommendationDAO = new RecommendationDAO() {
-                @Override
-                public List<Recommendation> getRecommendations() {
-                    return new ArrayList<>();
-                }
-            };
+            RecommendationDAO recommendDAO = new RecommendationRepository(userDAO, reservationDAO, tourDAO, "src/data/DemographicData.txt");
 
             // --- 2. Manager 계층 생성 (DAO 주입) ---
             UserManager2 userManager = new UserManager2(userDAO);
             TourCatalog2 tourCatalog = new TourCatalog2(tourDAO);
             ReservationManager2 reservationManager = new ReservationManager2(reservationDAO, userDAO, tourDAO);
             ReviewManager reviewManager = new ReviewManager(reviewDAO, reservationDAO, userDAO, tourDAO);
-            RecommendationManager recommendationManager = new RecommendationManager(recommendationDAO, tourCatalog, reservationManager);
+            RecommendationManager recommendationManager = new RecommendationManager(recommendDAO);
             SessionManager sessionManager = new SessionManager();
 
             // --- 3. ServiceContext 생성 및 모든 서비스/매니저 등록 ---
