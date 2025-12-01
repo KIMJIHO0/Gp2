@@ -26,7 +26,7 @@ public class RecommendationManager {
         for (int id : idsByDemo) {
             TourPackage2 t = dao.getTourById(id);
             if (t != null) results.add(
-                    new Recommendation(t, "나이/성별 기반 추천 (" + user.age + "세, " + user.sex + ")")
+                    new Recommendation(t.id, "나이/성별 기반 추천 (" + user.age + "세, " + user.sex + ")")
             );
         }
 
@@ -41,7 +41,7 @@ public class RecommendationManager {
         //tourId 기준으로 중복 제거
         Map<Integer, Recommendation> dedup = new LinkedHashMap<>();
         for (Recommendation r : results) {
-            dedup.putIfAbsent(r.getTourPackage().id, r);
+            dedup.putIfAbsent(r.getTourId(), r);
         }
 
         return new ArrayList<>(dedup.values());
@@ -82,7 +82,7 @@ public class RecommendationManager {
 
             if (ok) {
                 result.add(new Recommendation(
-                        t,
+                        t.id,
                         "사용자 선호 기반 추천 (지역/가격/교통)"
                 ));
             }
@@ -103,7 +103,7 @@ public class RecommendationManager {
         for (TourPackage2 t : getAllTours()) {
             if (t.price >= min && t.price <= max) {
                 result.add(new Recommendation(
-                        t,
+                        t.id,
                         "최근 예약 가격대와 유사한 추천"
                 ));
             }
