@@ -1,34 +1,35 @@
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-// 1. DAO 인터페이스 및 구현체 임포트
-import dao.UserDAO;
-import dao.TourDAO;
-import dao.ReservationDAO;
+// DAO 인터페이스 및 구현체 임포트
+import dao.RecommendationDAO;
+import dao.UserDAO2;
+import dao.TourDAO2;
+import dao.ReservationDAO2;
 import dao.ReviewDAO;
-import adapters.memory.MemUserDAO;
-import adapters.memory.MemTourDAO;
-import adapters.memory.MemReservationDAO;
-import adapters.memory.MemReviewDAO;
+import repository.UserRepository2;
+import repository.TourRepository2;
+import repository.ReservationRepository2;
+import repository.ReviewRepository;
+import repository.RecommendationRepository;
 
-// 2. Manager 임포트
-import manager.UserManager;
-import manager.TourCatalog;
-import manager.ReservationManager;
-import manager.ReviewManager;
-// import SessionManager; // (루트 디렉토리)
+// Manager 임포트
+import manager.UserManager2;
 import manager.SessionManager;
-// 3. UI-Kit 및 페이지 임포트
+import manager.TourCatalog2;
+import manager.ReservationManager2;
+import manager.RecommendationManager;
+import manager.ReviewManager;
+
+// UI-Kit 및 페이지 임포트
 import ui_kit.MainFrame;
 import ui_kit.ServiceContext;
-import pages.DefaultPage;
-// (실제 운영 시) import pages.LoginPage;
-// (실제 운영 시) import pages.HomePage;
-// (실제 운영 시) import pages.TourPanel;
+import pages.*;
+
 
 /**
- * 애플리케이션의 메인 엔트리 클래스입니다.
- * 모든 의존성을 조립(Wiring)하고 앱을 실행합니다.
+ * 애플리케이션의 메인 엔트리 포인트 (베타 1).
+ * 의존성을 설정하고 UI를 실행합니다.
  */
 public class App {
 
@@ -36,54 +37,55 @@ public class App {
         // Swing 앱은 항상 Event Dispatch Thread(EDT)에서 실행해야 합니다.
         SwingUtilities.invokeLater(() -> {
 
-            // --- 1. DAO 계층 생성 (메모리 기반 임시 구현체) ---
-            UserDAO userDAO = new MemUserDAO();
-            TourDAO tourDAO = new MemTourDAO();
-            ReservationDAO reservationDAO = new MemReservationDAO();
-            ReviewDAO reviewDAO = new MemReviewDAO();
+            // --- 1. DAO 계층 생성 ---
+            // repository 폴더의 DAO 구현체 사용
+            // 상품정보 외에 리뷰 등은 임시로 추가
+            UserDAO2 userDAO = new UserRepository2("src/data/UserData2.txt");
+            TourDAO2 tourDAO = new TourRepository2("src/data/TourPackageData2.txt");
+            ReservationDAO2 reservationDAO = new ReservationRepository2("src/data/ReservationData2.txt");
+            ReviewDAO reviewDAO = new ReviewRepository("src/data/ReviewData.txt");
+            RecommendationDAO recommendDAO = new RecommendationRepository(userDAO, reservationDAO, tourDAO, "src/data/DemographicData.txt");
 
             // --- 2. Manager 계층 생성 (DAO 주입) ---
-            UserManager userManager = new UserManager(userDAO);
-            TourCatalog tourCatalog = new TourCatalog(tourDAO);
-            ReservationManager reservationManager = new ReservationManager(reservationDAO,
-                                                    userDAO, tourDAO);
-            ReviewManager reviewManager = new ReviewManager(reviewDAO,
-                                            reservationDAO, userDAO, tourDAO);
-            
-            // --- 3. 전역 세션 매니저 생성 ---
+            UserManager2 userManager = new UserManager2(userDAO);
+            TourCatalog2 tourCatalog = new TourCatalog2(tourDAO);
+            ReservationManager2 reservationManager = new ReservationManager2(reservationDAO, userDAO, tourDAO);
+            ReviewManager reviewManager = new ReviewManager(reviewDAO, reservationDAO, userDAO, tourDAO);
+            RecommendationManager recommendationManager = new RecommendationManager(recommendDAO);
             SessionManager sessionManager = new SessionManager();
 
-            // --- 4. ServiceContext 생성 및 모든 서비스/매니저 등록 ---
+            // --- 3. ServiceContext 생성 및 모든 서비스/매니저 등록 ---
             ServiceContext context = new ServiceContext();
-            context.register(UserManager.class, userManager);
-            context.register(TourCatalog.class, tourCatalog);
-            context.register(ReservationManager.class, reservationManager);
+            context.register(UserManager2.class, userManager);
+            context.register(TourCatalog2.class, tourCatalog);
+            context.register(ReservationManager2.class, reservationManager);
             context.register(ReviewManager.class, reviewManager);
-            context.register(SessionManager.class, sessionManager); // SessionManager 등록
+            context.register(RecommendationManager.class, recommendationManager);
+            context.register(SessionManager.class, sessionManager);
+
+            // --- 4. 임시 세션 추가 (0000 계정) ---
+            // UserData.txt의 '0000 admin' 사용
+            // sessionManager.login(1245L);
 
             // --- 5. MainFrame 생성 (UI 셸) ---
             MainFrame mainFrame = new MainFrame();
 
             // --- 6. 페이지 생성 및 MainFrame에 등록 ---
-            // (팀원들이 pages/ 패키지에 만든 패널들을 여기서 조립합니다)
-            
-            // 조건 3: 생성한 기본 페이지 등록
-            mainFrame.addPage(new DefaultPage(context)); 
-            
-            // (실제 운영 시 예시)
-            // mainFrame.addPage(new LoginPage(context));
-            // mainFrame.addPage(new HomePage(context));
-            // mainFrame.addPage(new UserPanel(context));
-            // mainFrame.addPage(new TourPanel(context));
+            mainFrame.addPage(new DefaultPage(context));
+            mainFrame.addPage(new CatalogPage(context));       // id: catalog
+            mainFrame.addPage(new PackageDetailPage(context)); // id: tourDetail
+            mainFrame.addPage(new ReviewWritePage(context));   // id: reviewWrite
+            mainFrame.addPage(new LoginPage(context));
+            mainFrame.addPage(new SignupPage(context));
 
             // --- 7. 애플리케이션 실행 ---
-            mainFrame.setTitle("Tour Management System (TMS)");
+            mainFrame.setTitle("여행 예약 시스템 (Beta 1)");
             mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             mainFrame.setSize(1280, 800);
             mainFrame.setLocationRelativeTo(null); // 화면 중앙에 배치
 
-            // 조건 3: 만든 기본 페이지를 시작 페이지로 띄움
-            mainFrame.showPage("default", null); 
+            // --- 8. 맨 처음에 CatalogPage를 띄움 ---
+            mainFrame.showPage(LoginPage.PAGE_ID, null); // 1: 패키지 목록
             mainFrame.setVisible(true);
         });
     }
