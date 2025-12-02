@@ -27,6 +27,7 @@ import ui_kit.ServiceContext;
 import pages.*;
 
 
+
 /**
  * 애플리케이션의 메인 엔트리 포인트 (베타 1).
  * 의존성을 설정하고 UI를 실행합니다.
@@ -90,3 +91,4 @@ public class App {
         });
     }
 }
+
